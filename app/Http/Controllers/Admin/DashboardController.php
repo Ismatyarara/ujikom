@@ -28,4 +28,18 @@ class DashboardController extends Controller
             'obatMenupis'
         ));
     }
+     public function dashboard()
+{
+    $totalDokter = Dokter::count();
+    $totalUser   = User::count();
+    $totalStaff  = Staff::count();
+    $totalObat   = Obat::count();
+    $stokObat    = Obat::sum('stok');
+    $obatMenupis = Obat::where('stok', '<', 10)->count();
+
+    return view('admin.dashboard', compact(
+        'totalDokter', 'totalUser', 'totalStaff', 'totalObat', 'stokObat', 'obatMenupis'
+    ));
+}
+
 }

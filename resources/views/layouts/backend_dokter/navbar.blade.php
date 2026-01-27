@@ -1,4 +1,3 @@
-{{-- resources/views/layouts/dokter/navbar.blade.php --}}
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
     <a class="navbar-brand brand-logo mr-5" href="{{ route('dokter.dashboard') }}">
@@ -14,7 +13,7 @@
       <span class="icon-menu"></span>
     </button>
     
-    <ul class="navbar-nav navbar-nav-right">
+    {{-- <ul class="navbar-nav navbar-nav-right">
       <!-- Notifications -->
       <li class="nav-item dropdown">
         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
@@ -22,17 +21,43 @@
           <span class="count"></span>
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifikasi</p>
           <a class="dropdown-item preview-item">
             <div class="preview-thumbnail">
-              <div class="preview-icon bg-success">
-                <i class="ti-info-alt mx-0"></i>
+              <div class="preview-icon bg-warning">
+                <i class="ti-user mx-0"></i>
               </div>
             </div>
             <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Konsultasi Baru</h6>
+              <h6 class="preview-subject font-weight-normal">Pasien Baru Terdaftar</h6>
               <p class="font-weight-light small-text mb-0 text-muted">
-                Just now
+                5 menit yang lalu
+              </p>
+            </div>
+          </a>
+          <a class="dropdown-item preview-item">
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-info">
+                <i class="ti-calendar mx-0"></i>
+              </div>
+            </div>
+            <div class="preview-item-content">
+              <h6 class="preview-subject font-weight-normal">Jadwal Konsultasi Hari Ini</h6>
+              <p class="font-weight-light small-text mb-0 text-muted">
+                8 pasien menunggu
+              </p>
+            </div>
+          </a>
+          <a class="dropdown-item preview-item">
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-success">
+                <i class="ti-check mx-0"></i>
+              </div>
+            </div>
+            <div class="preview-item-content">
+              <h6 class="preview-subject font-weight-normal">Konsultasi Selesai</h6>
+              <p class="font-weight-light small-text mb-0 text-muted">
+                1 jam yang lalu
               </p>
             </div>
           </a>
@@ -42,25 +67,25 @@
       <!-- Profile -->
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-          <img src="{{ Auth::user()->dokter->foto ?? asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
+          <img src="{{ asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
           <div class="dropdown-header text-center">
             <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name }}</p>
             <p class="font-weight-light text-muted mb-0">{{ Auth::user()->email }}</p>
-            @if(Auth::user()->dokter && Auth::user()->dokter->spesialisasi)
-              <p class="font-weight-light text-muted mb-0">
-                <span class="badge badge-primary">{{ Auth::user()->dokter->spesialisasi->name }}</span>
-              </p>
-            @endif
+            <p class="font-weight-light text-muted mb-0"><small>Dokter</small></p>
           </div>
           <a class="dropdown-item" href="{{ route('dokter.profile') }}">
             <i class="ti-user text-primary"></i>
-            My Profile
+            Profil Saya
+          </a>
+          <a class="dropdown-item" href="{{ route('dokter.jadwal') }}">
+            <i class="ti-time text-primary"></i>
+            Atur Jadwal Praktik
           </a>
           <a class="dropdown-item" href="{{ route('dokter.settings') }}">
             <i class="ti-settings text-primary"></i>
-            Settings
+            Pengaturan
           </a>
           <a class="dropdown-item" href="{{ route('logout') }}" 
              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -76,5 +101,5 @@
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
       <span class="icon-menu"></span>
     </button>
-  </div>
+  </div> --}}
 </nav>

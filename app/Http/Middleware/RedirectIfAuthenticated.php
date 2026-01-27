@@ -26,7 +26,7 @@ class RedirectIfAuthenticated
                     case 'user':
                         return redirect()->route('user.dashboard');
                     default:
-                        return redirect('/home');
+                        return redirect('/');
                 }
             }
         }

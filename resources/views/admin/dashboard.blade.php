@@ -146,35 +146,6 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title mb-4">Aktivitas Terbaru</h4>
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Waktu</th>
-                <th>Aktivitas</th>
-                <th>User</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="4" class="text-center text-muted py-4">
-                  <i class="fas fa-history fa-2x mb-2"></i>
-                  <p>Belum ada aktivitas hari ini</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="row">
   <div class="col-lg-6 grid-margin stretch-card">
@@ -193,8 +164,8 @@
             </a>
           </div>
           <div class="col-6 mb-3">
-            <a href="{{ route('admin.obat.create') }}" class="btn btn-outline-warning btn-block">
-              <i class="fas fa-pills"></i> Tambah Obat
+            <a href="{{ route('admin.obat.pembelian') }}" class="btn btn-outline-warning btn-block">
+              <i class="fas fa-pills"></i> lihat pembelian
             </a>
           </div>
           <div class="col-6 mb-3">

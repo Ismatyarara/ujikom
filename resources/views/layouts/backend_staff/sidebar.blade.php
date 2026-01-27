@@ -1,5 +1,7 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
+        @if(Auth::check() && Auth::user()->role == 'staff')
+        
         <!-- Dashboard -->
         <li class="nav-item {{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.dashboard') }}">
@@ -40,6 +42,14 @@
             </a>
         </li>
 
+        <!-- Obat -->
+        <li class="nav-item {{ request()->routeIs('staff.obat.*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('staff.obat.index') }}">
+                <i class="fas fa-pills menu-icon"></i>
+                <span class="menu-title">Data Obat</span>
+            </a>
+        </li>
+
         <!-- Divider -->
         <li class="nav-item nav-category">
             <span class="nav-link">Pengaturan</span>
@@ -56,5 +66,18 @@
                 @csrf
             </form>
         </li>
+
+        @else
+        <!-- Jika bukan staff, tampilkan pesan -->
+        <li class="nav-item">
+            <div class="nav-link text-center">
+                <div class="alert alert-warning m-3">
+                    <i class="icon-ban menu-icon"></i>
+                    <p class="mb-0">Akses Terbatas</p>
+                    <small>Anda tidak memiliki akses ke menu ini</small>
+                </div>
+            </div>
+        </li>
+        @endif
     </ul>
 </nav>

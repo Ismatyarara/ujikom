@@ -27,7 +27,6 @@ class DokterController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
             'nama' => 'required|string|max:255',
@@ -38,14 +37,16 @@ class DokterController extends Controller
             'tempat_praktik' => 'required|string',
         ]);
 
+        // Create user - PERBAIKAN: gunakan 'nama' bukan 'name'
         $user = User::create([
-            'name' => $validated['name'],
+            'name' => $validated['nama'], // FIX: gunakan 'nama' dari validated
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'dokter',
             'email_verified_at' => now(),
         ]);
 
+        // Create dokter
         Dokter::create([
             'id_user' => $user->id,
             'nama' => $validated['nama'],
@@ -75,7 +76,6 @@ class DokterController extends Controller
     public function update(Request $request, Dokter $dokter)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $dokter->id_user,
             'password' => 'nullable|min:8',
             'nama' => 'required|string|max:255',
@@ -86,12 +86,14 @@ class DokterController extends Controller
             'tempat_praktik' => 'required|string',
         ]);
 
+        // Update user - PERBAIKAN: gunakan 'nama' bukan 'name'
         $dokter->pengguna->update([
-            'name' => $validated['name'],
+            'name' => $validated['nama'], // FIX: gunakan 'nama' dari validated
             'email' => $validated['email'],
             'password' => $request->filled('password') ? Hash::make($validated['password']) : $dokter->pengguna->password,
         ]);
 
+        // Prepare dokter data
         $dokterData = [
             'nama' => $validated['nama'],
             'id_spesialisasi' => $validated['id_spesialisasi'],
@@ -100,8 +102,11 @@ class DokterController extends Controller
             'tempat_praktik' => $validated['tempat_praktik'],
         ];
 
+        // Handle foto upload
         if ($request->hasFile('foto')) {
-            if ($dokter->foto) Storage::disk('public')->delete($dokter->foto);
+            if ($dokter->foto) {
+                Storage::disk('public')->delete($dokter->foto);
+            }
             $dokterData['foto'] = $request->file('foto')->store('dokter', 'public');
         }
 
@@ -112,7 +117,12 @@ class DokterController extends Controller
 
     public function destroy(Dokter $dokter)
     {
-        if ($dokter->foto) Storage::disk('public')->delete($dokter->foto);
+        // Delete foto if exists
+        if ($dokter->foto) {
+            Storage::disk('public')->delete($dokter->foto);
+        }
+        
+        // Delete user (cascade will delete dokter)
         $dokter->pengguna->delete();
         
         return redirect()->route('admin.dokter.index')->with('success', 'Dokter berhasil dihapus');

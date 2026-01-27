@@ -10,7 +10,7 @@
         <h4 class="card-title">Edit Data Obat</h4>
         <p class="card-description">Perbarui data obat</p>
 
-        <form action="{{ route('admin.obat.update', $obat->id) }}" 
+        <form action="{{ route('staff.obat.update', $obat->id) }}" 
               method="POST" 
               enctype="multipart/form-data">
           @csrf
@@ -126,7 +126,7 @@
           <button class="btn btn-primary">
             <i class="fas fa-save"></i> Update
           </button>
-          <a href="{{ route('admin.obat.index') }}" class="btn btn-light">
+          <a href="{{ route('staff.obat.index') }}" class="btn btn-light">
             Kembali
           </a>
 

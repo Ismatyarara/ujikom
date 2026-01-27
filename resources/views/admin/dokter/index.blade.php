@@ -100,7 +100,7 @@
 function confirmDelete(id) {
   if (confirm('Yakin hapus data ini?')) {
     document.getElementById('delete-form-' + id).submit();
-  }
+  } 
 }
 </script>
 @endsection

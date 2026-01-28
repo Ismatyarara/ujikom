@@ -8,12 +8,13 @@
       <i class="fas fa-hospital text-primary"></i>
     </a>
   </div>
+  
   <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
     <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
       <span class="icon-menu"></span>
     </button>
     
-    {{-- <ul class="navbar-nav navbar-nav-right">
+    <ul class="navbar-nav navbar-nav-right">
       <!-- Notifications -->
       <li class="nav-item dropdown">
         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
@@ -51,25 +52,42 @@
         </div>
       </li>
       
-      <!-- Profile -->
+      <!-- Profile Dropdown -->
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-          <img src="{{ asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
+          @if(Auth::user()->profile && Auth::user()->profile->foto)
+            <img src="{{ asset('storage/'.Auth::user()->profile->foto) }}" alt="profile"/>
+          @else
+            <img src="{{ asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
+          @endif
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
           <div class="dropdown-header text-center">
-            <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name }}</p>
+            @if(Auth::user()->profile)
+              <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->profile->nama_panjang }}</p>
+            @else
+              <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name }}</p>
+            @endif
             <p class="font-weight-light text-muted mb-0">{{ Auth::user()->email }}</p>
             <p class="font-weight-light text-muted mb-0"><small>Pasien</small></p>
           </div>
-          <a class="dropdown-item" href="{{ route('user.profile') }}">
-            <i class="ti-user text-primary"></i>
-            Profil Saya
-          </a>
-          <a class="dropdown-item" href="{{ route('user.settings') }}">
-            <i class="ti-settings text-primary"></i>
-            Pengaturan
-          </a>
+          
+          @if(Auth::user()->profile)
+            <a class="dropdown-item" href="{{ route('user.profile.show') }}">
+              <i class="ti-user text-primary"></i>
+              Profil Saya
+            </a>
+            <a class="dropdown-item" href="{{ route('user.profile.edit') }}">
+              <i class="ti-settings text-primary"></i>
+              Edit Profil
+            </a>
+          @else
+            <a class="dropdown-item" href="{{ route('user.profile.create') }}">
+              <i class="ti-user text-warning"></i>
+              Lengkapi Profil
+            </a>
+          @endif
+          
           <a class="dropdown-item" href="{{ route('logout') }}" 
              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="ti-power-off text-primary"></i>
@@ -81,8 +99,9 @@
         </div>
       </li>
     </ul>
+    
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-      <span class="icon-menu"></span> --}}
+      <span class="icon-menu"></span>
     </button>
   </div>
 </nav>

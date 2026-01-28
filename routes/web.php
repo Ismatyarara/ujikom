@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\ObatController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\DashboardController;
+use App\Http\Controllers\User\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,8 +22,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('dokter', App\Http\Controllers\Admin\DokterController::class);
     Route::resource('users', App\Http\Controllers\Admin\UserController::class);
-    Route::get('obat', [ObatController::class, 'index'])->name('obat.index');
+   // Route pembelian HARUS di atas resource obat
     Route::get('obat/pembelian', [ObatController::class, 'pembelian'])->name('obat.pembelian');
+    // Route Obat (resource)
+    Route::resource('obat', ObatController::class);
     Route::get('obat/{id}', [ObatController::class, 'show'])->name('obat.show');
     Route::resource('staff', App\Http\Controllers\Admin\StaffController::class);
     Route::resource('spesialisasi', App\Http\Controllers\Admin\SpesialisasiController::class); 
@@ -54,12 +58,24 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
      Route::resource('obat', App\Http\Controllers\Staff\ObatController::class);
 });
 
+
+
 Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\User\DashboardController::class, 'index'])->name('dashboard');
-    // Route::resource('profile', App\Http\Controllers\User\ProfileController::class)->only(['index', 'edit', 'update']);
-    // Route::resource('konsultasi', App\Http\Controllers\User\KonsultasiController::class);
-    // Route::resource('chat', App\Http\Controllers\User\ChatController::class);
-    // Route::resource('catatan-medis', App\Http\Controllers\User\CatatanMedisController::class)->only(['index', 'show']);
-    // Route::resource('obat', App\Http\Controllers\User\ObatController::class)->only(['index', 'show']);
-    // Route::resource('jadwal-obat', App\Http\Controllers\User\JadwalObatController::class);
+    
+    // Dashboard - ada pengecekan profile di controller
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Profile Routes
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::get('/create', [ProfileController::class, 'create'])->name('create');
+        Route::post('/', [ProfileController::class, 'store'])->name('store');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    });
+
 });
+
+
+

@@ -103,6 +103,7 @@ class DatabaseSeeder extends Seeder
     'harga'        => 2000,
     'satuan'       => 'tablet',
     'status'       => 1,
+    'user_id'      => 1,
 ]
            
         ];

@@ -3,143 +3,158 @@
 @section('title', 'Tambah Barang Keluar')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Tambah Barang Keluar</h1>
-        <a href="{{ route('staff.barang-keluar.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-    </div>
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Form Barang Keluar</h6>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('staff.barang-keluar.store') }}" method="POST">
-                @csrf
-                
-                <div class="form-group">
-                    <label for="id_obat">Pilih Obat <span class="text-danger">*</span></label>
-                    <select name="id_obat" id="id_obat" class="form-control @error('id_obat') is-invalid @enderror" required>
-                        <option value="">-- Pilih Obat --</option>
-                        @foreach($obat as $item)
-                            <option value="{{ $item->id }}" 
-                                    data-stok="{{ $item->stok }}"
-                                    data-satuan="{{ $item->satuan }}"
-                                    {{ old('id_obat') == $item->id ? 'selected' : '' }}>
-                                {{ $item->nama_obat }} (Stok: {{ $item->stok }} {{ $item->satuan }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('id_obat')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small id="stok-info" class="form-text text-muted"></small>
-                </div>
-
-                <div class="form-group">
-                    <label for="jumlah">Jumlah <span class="text-danger">*</span></label>
-                    <input type="number" 
-                           name="jumlah" 
-                           id="jumlah" 
-                           class="form-control @error('jumlah') is-invalid @enderror" 
-                           value="{{ old('jumlah') }}"
-                           min="1"
-                           placeholder="Masukkan jumlah"
-                           required>
-                    @error('jumlah')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="tanggal_keluar">Tanggal Keluar <span class="text-danger">*</span></label>
-                    <input type="date" 
-                           name="tanggal_keluar" 
-                           id="tanggal_keluar" 
-                           class="form-control @error('tanggal_keluar') is-invalid @enderror" 
-                           value="{{ old('tanggal_keluar', date('Y-m-d')) }}"
-                           required>
-                    @error('tanggal_keluar')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="deskripsi">Deskripsi</label>
-                    <textarea name="deskripsi" 
-                              id="deskripsi" 
-                              class="form-control @error('deskripsi') is-invalid @enderror" 
-                              rows="3"
-                              placeholder="Keterangan tambahan (opsional)">{{ old('deskripsi') }}</textarea>
-                    @error('deskripsi')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan
-                    </button>
-                    <a href="{{ route('staff.barang-keluar.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Batal
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="card-title mb-0">Tambah Barang Keluar</h4>
+                    <a href="{{ route('staff.barang-keluar.index') }}" class="btn btn-light btn-sm">
+                        <i class="mdi mdi-arrow-left"></i> Kembali
                     </a>
                 </div>
-            </form>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Terdapat kesalahan!</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                @endif
+
+                <form action="{{ route('staff.barang-keluar.store') }}" method="POST">
+                    @csrf
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Informasi Obat</h5>
+
+                                    <div class="form-group">
+                                        <label for="id_obat">Pilih Obat <span class="text-danger">*</span></label>
+                                        <select name="id_obat" id="id_obat"
+                                                class="form-control @error('id_obat') is-invalid @enderror" required>
+                                            <option value="">-- Pilih Obat --</option>
+                                            @foreach($obat as $item)
+                                                <option value="{{ $item->id }}" 
+                                                        data-stok="{{ $item->stok }}"
+                                                        data-satuan="{{ $item->satuan }}"
+                                                        {{ old('id_obat') == $item->id ? 'selected' : '' }}>
+                                                    {{ $item->kode_obat }} - {{ $item->nama_obat }} 
+                                                    (Stok: {{ $item->stok }} {{ $item->satuan }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_obat')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="jumlah">Jumlah Keluar <span class="text-danger">*</span></label>
+                                        <input type="number" name="jumlah" id="jumlah"
+                                               class="form-control @error('jumlah') is-invalid @enderror"
+                                               value="{{ old('jumlah') }}"
+                                               min="1" placeholder="0" required>
+                                        @error('jumlah')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="text-muted" id="stok-info"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Informasi Tanggal</h5>
+
+                                    <div class="form-group">
+                                        <label for="tanggal_keluar">Tanggal Keluar <span class="text-danger">*</span></label>
+                                        <input type="date" name="tanggal_keluar" id="tanggal_keluar"
+                                               class="form-control @error('tanggal_keluar') is-invalid @enderror"
+                                               value="{{ old('tanggal_keluar', date('Y-m-d')) }}"
+                                               max="{{ date('Y-m-d') }}" required>
+                                        @error('tanggal_keluar')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="deskripsi">Deskripsi/Tujuan <span class="text-danger">*</span></label>
+                                        <textarea name="deskripsi" id="deskripsi" rows="4"
+                                                  class="form-control @error('deskripsi') is-invalid @enderror"
+                                                  placeholder="Contoh: Untuk keperluan ruang rawat inap, dll"
+                                                  required>{{ old('deskripsi') }}</textarea>
+                                        @error('deskripsi')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-body bg-light">
+                            <div class="alert alert-info mb-0">
+                                <i class="mdi mdi-information"></i>
+                                <strong>Perhatian:</strong> Stok obat akan otomatis berkurang sesuai jumlah yang diinput.
+                                Pastikan jumlah yang diinput benar.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="mdi mdi-content-save"></i> Simpan Barang Keluar
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ route('staff.barang-keluar.index') }}" class="btn btn-light btn-block">
+                                        <i class="mdi mdi-close"></i> Batal
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Select2 untuk dropdown obat
-        $('#id_obat').select2({
-            placeholder: '-- Pilih Obat --',
-            allowClear: true
-        });
+    const obat = document.getElementById('id_obat');
+    const jumlah = document.getElementById('jumlah');
+    const info = document.getElementById('stok-info');
 
-        // Tampilkan info stok saat obat dipilih
-        $('#id_obat').on('change', function() {
-            const selectedOption = $(this).find('option:selected');
-            const stok = selectedOption.data('stok');
-            const satuan = selectedOption.data('satuan');
-            
-            if (stok !== undefined) {
-                $('#stok-info').html(`<strong>Stok tersedia: ${stok} ${satuan}</strong>`);
-                $('#jumlah').attr('max', stok);
-            } else {
-                $('#stok-info').html('');
-                $('#jumlah').removeAttr('max');
-            }
-        });
+    obat.addEventListener('change', () => {
+        const opt = obat.options[obat.selectedIndex];
+        const stok = opt.dataset.stok;
+        const satuan = opt.dataset.satuan;
 
-        // Validasi jumlah tidak melebihi stok
-        $('#jumlah').on('input', function() {
-            const max = parseInt($(this).attr('max'));
-            const value = parseInt($(this).val());
-            
-            if (max && value > max) {
-                $(this).addClass('is-invalid');
-                if (!$(this).next('.invalid-feedback').length) {
-                    $(this).after(`<div class="invalid-feedback">Jumlah tidak boleh melebihi stok yang tersedia (${max})</div>`);
-                }
-            } else {
-                $(this).removeClass('is-invalid');
-                $(this).next('.invalid-feedback').remove();
-            }
-        });
+        if (stok) {
+            info.textContent = `Stok tersedia: ${stok} ${satuan}`;
+            jumlah.max = stok;
+        } else {
+            info.textContent = '';
+            jumlah.removeAttribute('max');
+        }
     });
 </script>
 @endpush
+@endsection

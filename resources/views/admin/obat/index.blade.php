@@ -25,6 +25,9 @@
                                 <th>Harga</th>
                                 <th>Satuan</th>
                                 <th>Stok</th>
+                                <th>Ditambahkan</th>
+                                <th>Diubah</th>
+                                <th>Ditambahkan Oleh</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
@@ -42,6 +45,11 @@
                                     <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
                                     <td>{{ $item->satuan }}</td>
                                     <td>{{ $item->stok }}</td>
+                                    <td>{{ $item->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $item->updated_at->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        {{$item->user->name}}
+                                    </td>
                                     <td>
                                         @if ($item->status === 'aktif')
                                             <span class="badge bg-success">Aktif</span>
@@ -50,9 +58,6 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.obat.pembelian') }}" class="btn btn-secondary btn-sm mb-1">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </a>
                                         <a href="{{ route('admin.obat.show', $item->id) }}" class="btn btn-info btn-sm mb-1">
                                             <i class="fas fa-eye"></i>
                                         </a>
@@ -60,7 +65,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted py-4">
+                                    <td colspan="12" class="text-center text-muted py-4">
                                         <i class="fas fa-inbox fa-2x mb-2"></i><br>
                                         Belum ada data obat
                                     </td>

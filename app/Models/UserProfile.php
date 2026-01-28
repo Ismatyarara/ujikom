@@ -9,26 +9,34 @@ class UserProfile extends Model
 {
     use HasFactory;
 
+    protected $table = 'user_profiles';
+
     protected $fillable = [
-        'id_user',
+        'user_id',
         'nama_panjang',
         'tanggal_lahir',
+        'jenis_kelamin',
         'golongan_darah',
+        'no_hp',
+        'alamat',
+        'foto', // opsional
     ];
 
     protected $casts = [
         'tanggal_lahir' => 'date',
     ];
 
-    // Relationships
+    // Relasi
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class,'user_id');
     }
 
-    // Accessor
+    // Accessor umur
     public function getUmurAttribute()
     {
-        return $this->tanggal_lahir?->age;
+        return $this->tanggal_lahir
+            ? $this->tanggal_lahir->age
+            : null;
     }
 }

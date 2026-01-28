@@ -11,22 +11,35 @@ class Obat extends Model
 
     protected $table = 'obat';
 
-   protected $fillable = [
-    'kode_obat',
-    'foto',
-    'nama_obat',
-    'deskripsi',
-    'aturan_pakai',
-    'efek_samping',
-    'stok',
-    'harga',
-    'satuan',
-    'status',
-];
+    protected $fillable = [
+        'kode_obat',
+        'foto',
+        'nama_obat',
+        'deskripsi',
+        'aturan_pakai',
+        'efek_samping',
+        'stok',
+        'harga',
+        'satuan',
+        'status',
+        'user_id', // Tambahkan ini jika belum ada
+    ];
 
+    // Cast status ke boolean
     protected $casts = [
+        'status' => 'boolean',
+        'tanggal_kadaluarsa' => 'date',
         'stok' => 'integer',
     ];
+
+    // public function staff()
+    // {
+    //     return $this->belongsTo(User::class, 'users_id');
+    // }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     // Relasi
     public function barangMasuk()

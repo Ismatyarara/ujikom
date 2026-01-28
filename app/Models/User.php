@@ -32,9 +32,9 @@ class User extends Authenticatable
     }
 
     // Relasi
-    public function profil()
+    public function profile()
     {
-        return $this->hasOne(UserProfile::class, 'id_user');
+        return $this->hasOne(UserProfile::class, 'user_id');
     }
 
     public function dokter()

@@ -23,6 +23,7 @@ return new class extends Migration
     $table->integer('harga');
     $table->string('satuan')->default('tablet');
     $table->date('tanggal_kadaluarsa')->nullable();
+    $table->foreignId('user_id');
     $table->boolean('status')->default(true);
     $table->timestamps();
 });

@@ -43,8 +43,15 @@
                 </td>
 
                 <td>
-                  <img src="{{ $item->foto_url }}" class="img-thumbnail"
-                       width="50" height="50" style="object-fit:cover">
+                  @if($item->foto)
+                    <img src="{{ asset('storage/' . $item->foto) }}" 
+                         class="img-thumbnail" width="50" height="50" 
+                         style="object-fit:cover" alt="Foto Obat">
+                  @else
+                    <img src="{{ asset('images/no-image.png') }}" 
+                         class="img-thumbnail" width="50" height="50" 
+                         style="object-fit:cover" alt="No Image">
+                  @endif
                 </td>
 
                 <td>{{ $item->nama_obat }}</td>
@@ -66,7 +73,7 @@
                 </td>
 
                 <td>
-                  @if($item->status === 'aktif')
+                  @if($item->status == 1)
                     <span class="badge bg-success">Aktif</span>
                   @else
                     <span class="badge bg-secondary">Nonaktif</span>
@@ -78,10 +85,12 @@
                 </td>
 
                 <td>
-                  <a href="{{ route('staff.obat.show', $item->id) }}" class="btn btn-info btn-sm">
+                  <a href="{{ route('staff.obat.show', $item->id) }}" 
+                     class="btn btn-info btn-sm">
                     <i class="fas fa-eye"></i>
                   </a>
-                  <a href="{{ route('staff.obat.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                  <a href="{{ route('staff.obat.edit', $item->id) }}" 
+                     class="btn btn-warning btn-sm">
                     <i class="fas fa-edit"></i>
                   </a>
                   
@@ -90,7 +99,7 @@
                         onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                     @csrf
                     @method('DELETE')
-                    <button class="btn btn-danger btn-sm">
+                    <button type="submit" class="btn btn-danger btn-sm">
                       <i class="fas fa-trash"></i>
                     </button>
                   </form>

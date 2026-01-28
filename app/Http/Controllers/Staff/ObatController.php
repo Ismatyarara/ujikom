@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\staff;
+namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Obat;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ObatController extends Controller
 {
     public function index()
     {
-        $obat = Obat::paginate(10);
+        $obat = Obat::latest()->paginate(10);
         return view('staff.obat.index', compact('obat'));
     }
 
@@ -20,34 +20,32 @@ class ObatController extends Controller
         return view('staff.obat.create');
     }
 
- public function store(Request $request)
-{
-    $validated = $request->validate([
-        'nama_obat'    => 'required|string|max:255',
-        'deskripsi'    => 'required|string',
-        'aturan_pakai' => 'required|string',
-        'efek_samping' => 'required|string',
-        'stok'         => 'required|integer|min:0',
-        'harga'        => 'required|integer|min:0',
-        'satuan'       => 'required|string|max:50',
-        'status'       => 'required|boolean',
-        'foto'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'nama_obat'    => 'required',
+            'deskripsi'    => 'required',
+            'aturan_pakai' => 'required',
+            'efek_samping' => 'required',
+            'stok'         => 'required|numeric',
+            'harga'        => 'required|numeric',
+            'satuan'       => 'required',
+            'status'       => 'required|boolean',
+            'foto'         => 'nullable|image',
+        ]);
 
-    // kode otomatis
-    $validated['kode_obat'] = 'OBT-' . str_pad(Obat::count() + 1, 4, '0', STR_PAD_LEFT);
+        $data['kode_obat'] = 'OBT-' . time();
 
-    // upload foto
-    if ($request->hasFile('foto')) {
-        $validated['foto'] = $request->file('foto')->store('obat', 'public');
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->foto->store('obat', 'public');
+        }
+
+        $data['user_id'] = Auth::id();
+        Obat::create($data);
+
+        return redirect()->route('staff.obat.index')
+            ->with('success', 'Obat berhasil ditambahkan');
     }
-
-    Obat::create($validated);
-
-    return redirect()->route('staff.obat.index')
-        ->with('success', 'Obat berhasil ditambahkan');
-}
-
 
     public function show(Obat $obat)
     {
@@ -59,39 +57,35 @@ class ObatController extends Controller
         return view('staff.obat.edit', compact('obat'));
     }
 
-     public function update(Request $request, Obat $obat)
-{
-    $validated = $request->validate([
-        'nama_obat'    => 'required|string|max:255',
-        'deskripsi'    => 'required|string',
-        'aturan_pakai' => 'required|string',
-        'efek_samping' => 'required|string',
-        'stok'         => 'required|integer|min:0',
-        'harga'        => 'required|integer|min:0',
-        'satuan'       => 'required|string|max:50',
-        'status'       => 'required|boolean',
-        'foto'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
+    public function update(Request $request, Obat $obat)
+    {
+        $data = $request->validate([
+            'nama_obat'    => 'required',
+            'deskripsi'    => 'required',
+            'aturan_pakai' => 'required',
+            'efek_samping' => 'required',
+            'stok'         => 'required|numeric',
+            'harga'        => 'required|numeric',
+            'satuan'       => 'required',
+            'status'       => 'required|boolean',
+            'foto'         => 'nullable|image',
+        ]);
 
-    if ($request->hasFile('foto')) {
-        if ($obat->foto) {
-            Storage::disk('public')->delete($obat->foto);
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->foto->store('obat', 'public');
         }
-        $validated['foto'] = $request->file('foto')->store('obat', 'public');
+
+        $obat->update($data);
+
+        return redirect()->route('staff.obat.index')
+            ->with('success', 'Obat berhasil diupdate');
     }
-
-    $obat->update($validated);
-
-    return redirect()->route('staff.obat.index')
-        ->with('success', 'Data obat berhasil diupdate');
-}
-
 
     public function destroy(Obat $obat)
     {
-        if ($obat->foto) Storage::disk('public')->delete($obat->foto);
         $obat->delete();
 
-        return redirect()->route('staff.obat.index')->with('success', 'Obat berhasil dihapus');
+        return redirect()->route('staff.obat.index')
+            ->with('success', 'Obat berhasil dihapus');
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\BarangKeluar;
 use App\Models\Obat;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class BarangKeluarController extends Controller
@@ -13,113 +13,101 @@ class BarangKeluarController extends Controller
     public function index()
     {
         $barangKeluar = BarangKeluar::with('obat')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(10);
-        
+
         return view('staff.barang-keluar.index', compact('barangKeluar'));
     }
-    
+
     public function create()
     {
-        $obat = Obat::where('stok', '>', 0)->get();
+        $obat = Obat::where('stok', '>', 0)
+            ->where('status', 1)
+            ->get();
+
         return view('staff.barang-keluar.create', compact('obat'));
     }
-    
+
     public function store(Request $request)
     {
-        $request->validate([
-            'id_obat' => 'required|exists:obat,id',
-            'jumlah' => 'required|integer|min:1',
+        $data = $request->validate([
+            'id_obat' => 'required',
+            'jumlah' => 'required|numeric',
             'tanggal_keluar' => 'required|date',
-            'deskripsi' => 'nullable|string'
+            'deskripsi' => 'nullable',
         ]);
-        
-        DB::beginTransaction();
-        try {
-            $obat = Obat::findOrFail($request->id_obat);
-            
-            // Cek stok
-            if ($obat->stok < $request->jumlah) {
-                return back()->with('error', 'Stok obat tidak mencukupi. Stok tersedia: ' . $obat->stok);
+
+        DB::transaction(function () use ($data) {
+
+            $obat = Obat::findOrFail($data['id_obat']);
+
+            if ($obat->stok < $data['jumlah']) {
+                abort(403, 'Stok obat tidak mencukupi');
             }
-            
-            // Buat transaksi barang keluar
-            BarangKeluar::create([
-                'id_obat' => $request->id_obat,
-                'kode' => 'BK-' . date('Ymd') . '-' . str_pad(BarangKeluar::count() + 1, 4, '0', STR_PAD_LEFT),
-                'jumlah' => $request->jumlah,
-                'tanggal_keluar' => $request->tanggal_keluar,
-                'deskripsi' => $request->deskripsi
-            ]);
-            
-            // Kurangi stok
-            $obat->decrement('stok', $request->jumlah);
-            
-            DB::commit();
-            return redirect()->route('staff.barang-keluar.index')->with('success', 'Barang keluar berhasil ditambahkan');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+
+            $data['kode'] = 'BK-' . time();
+            BarangKeluar::create($data);
+
+            $obat->decrement('stok', $data['jumlah']);
+        });
+
+        return redirect()->route('staff.barang-keluar.index')
+            ->with('success', 'Barang keluar berhasil ditambahkan');
     }
-    
-    public function show($id)
+
+    public function show(BarangKeluar $barangKeluar)
     {
-        $barangKeluar = BarangKeluar::with('obat')->findOrFail($id);
         return view('staff.barang-keluar.show', compact('barangKeluar'));
     }
-    
-    public function edit($id)
+
+    public function edit(BarangKeluar $barangKeluar)
     {
-        $barangKeluar = BarangKeluar::findOrFail($id);
-        $obat = Obat::all();
+        $obat = Obat::where('status', 1)->get();
         return view('staff.barang-keluar.edit', compact('barangKeluar', 'obat'));
     }
-    
-   public function update(Request $request, BarangKeluar $barangKeluar)
-{
-    $request->validate([
-        'id_obat' => 'required|exists:obat,id',
-        'jumlah' => 'required|integer|min:1',
-        'tanggal_keluar' => 'required|date',
-        'deskripsi' => 'nullable|string'
-    ]);
 
-    DB::transaction(function () use ($request, $barangKeluar) {
-        // 1. Kembalikan stok obat lama
-        Obat::findOrFail($barangKeluar->id_obat)->increment('stok', $barangKeluar->jumlah);
-
-        // 2. Kurangi stok obat baru
-        $obatBaru = Obat::findOrFail($request->id_obat);
-        if ($obatBaru->stok < $request->jumlah) {
-            throw new \Exception('Stok obat tidak mencukupi.');
-        }
-        $obatBaru->decrement('stok', $request->jumlah);
-
-        // 3. Update data barang keluar
-        $barangKeluar->update($request->only('id_obat', 'jumlah', 'tanggal_keluar', 'deskripsi'));
-    });
-
-    return redirect()->route('staff.barang-keluar.index')->with('success', 'Barang keluar berhasil diupdate');
-}
-
-    public function destroy($id)
+    public function update(Request $request, BarangKeluar $barangKeluar)
     {
-        DB::beginTransaction();
-        try {
-            $barangKeluar = BarangKeluar::findOrFail($id);
-            
-            // Kembalikan stok
-            $obat = Obat::findOrFail($barangKeluar->id_obat);
-            $obat->increment('stok', $barangKeluar->jumlah);
-            
+        $data = $request->validate([
+            'id_obat' => 'required',
+            'jumlah' => 'required|numeric',
+            'tanggal_keluar' => 'required|date',
+            'deskripsi' => 'nullable',
+        ]);
+
+        DB::transaction(function () use ($data, $barangKeluar) {
+
+            // balikin stok lama
+            Obat::where('id', $barangKeluar->id_obat)
+                ->increment('stok', $barangKeluar->jumlah);
+
+            $obatBaru = Obat::findOrFail($data['id_obat']);
+
+            if ($obatBaru->stok < $data['jumlah']) {
+                abort(403, 'Stok obat tidak mencukupi');
+            }
+
+            // kurangi stok baru
+            $obatBaru->decrement('stok', $data['jumlah']);
+
+            $barangKeluar->update($data);
+        });
+
+        return redirect()->route('staff.barang-keluar.index')
+            ->with('success', 'Barang keluar berhasil diupdate');
+    }
+
+    public function destroy(BarangKeluar $barangKeluar)
+    {
+        DB::transaction(function () use ($barangKeluar) {
+
+            Obat::where('id', $barangKeluar->id_obat)
+                ->increment('stok', $barangKeluar->jumlah);
+
             $barangKeluar->delete();
-            
-            DB::commit();
-            return redirect()->route('staff.barang-keluar.index')->with('success', 'Barang keluar berhasil dihapus');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        });
+
+        return redirect()->route('staff.barang-keluar.index')
+            ->with('success', 'Barang keluar berhasil dihapus');
     }
 }

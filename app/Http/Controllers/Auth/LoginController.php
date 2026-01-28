@@ -48,15 +48,26 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
+        // Redirect berdasarkan role
         switch($user->role) {
             case 'admin':
                 return redirect()->route('admin.dashboard');
+                
             case 'dokter':
                 return redirect()->route('dokter.dashboard');
+                
             case 'staff':
                 return redirect()->route('staff.dashboard');
+                
             case 'user':
+                // Cek apakah user sudah punya profile
+                if (!$user->profile) {
+                    return redirect()->route('user.profile.create')
+                        ->with('warning', 'Silakan lengkapi profile Anda terlebih dahulu untuk mengakses dashboard.');
+                }
+                // Jika sudah punya profile, ke dashboard
                 return redirect()->route('user.dashboard');
+                
             default:
                 return redirect('/home');
         }

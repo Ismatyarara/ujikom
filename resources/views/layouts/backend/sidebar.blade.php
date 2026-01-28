@@ -7,7 +7,7 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
-        
+
         <!-- Spesialisasi -->
         <li class="nav-item {{ request()->routeIs('admin.spesialisasi.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.spesialisasi.index') }}">
@@ -33,10 +33,18 @@
         </li>
 
         <!-- Obat -->
-        <li class="nav-item {{ request()->routeIs('admin.obat.*') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('admin.obat.index') || request()->routeIs('admin.obat.create') || request()->routeIs('admin.obat.edit') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.obat.index') }}">
                 <i class="fas fa-pills menu-icon"></i>
                 <span class="menu-title">Data Obat</span>
+            </a>
+        </li>
+
+        <!-- Pembelian Obat -->
+        <li class="nav-item {{ request()->routeIs('admin.obat.pembelian') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.obat.pembelian') }}">
+                <i class="fas fa-shopping-cart menu-icon"></i>
+                <span class="menu-title"> Data Pembelian Obat</span>
             </a>
         </li>
 

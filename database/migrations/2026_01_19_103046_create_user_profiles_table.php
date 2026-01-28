@@ -13,10 +13,14 @@ return new class extends Migration
     {
        Schema::create('user_profiles', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
+    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
     $table->string('nama_panjang');
     $table->date('tanggal_lahir');
-    $table->string('golongan_darah', 3);
+    $table->enum('jenis_kelamin', ['L', 'P']);
+    $table->string('golongan_darah', 3)->nullable();
+    $table->string('no_hp')->nullable();
+    $table->text('alamat')->nullable();
+    $table->string('foto')->nullable();
     $table->timestamps();
 });
     }

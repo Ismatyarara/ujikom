@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
@@ -29,7 +31,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/user/dashboard'; // PERBAIKI INI
+    protected $redirectTo = '/user/profile/create'; // Redirect ke create profile
 
     /**
      * Create a new controller instance.
@@ -68,12 +70,13 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'user', // TAMBAHKAN INI - Set default role ke 'user'
+            'role' => 'user', // Default role
         ]);
     }
 
     /**
      * The user has been registered.
+     * Override method ini untuk custom redirect dengan flash message
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
@@ -81,7 +84,7 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-        // Redirect ke dashboard user setelah register
-        return redirect()->route('user.dashboard');
+        return redirect()->route('user.profile.create')
+            ->with('success', 'Registrasi berhasil! Silakan lengkapi profile Anda terlebih dahulu.');
     }
 }

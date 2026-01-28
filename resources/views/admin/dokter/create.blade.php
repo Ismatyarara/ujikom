@@ -76,17 +76,16 @@
                                 @enderror
                             </div>
 
-                            <td>
-                                @if ($dokter->foto)
-                                    <img src="{{ Storage::url($dokter->foto) }}" alt="{{ $dokter->nama }}"
-                                        class="img-thumbnail" style="max-width: 80px; max-height: 80px; object-fit: cover;">
-                                @else
-                                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
-                                        style="width: 80px; height: 80px;">
-                                        <i class="fas fa-user fa-2x"></i>
-                                    </div>
-                                @endif
-                            </td>
+                            {{-- Foto --}}
+                            <div class="form-group mb-3">
+                                <label for="foto">Foto Dokter</label>
+                                <input type="file" class="form-control @error('foto') is-invalid @enderror"
+                                    id="foto" name="foto" accept="image/jpeg,image/png,image/jpg">
+                                <small class="form-text text-muted">Format: JPG, JPEG, PNG. Maksimal 2MB</small>
+                                @error('foto')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
                             {{-- Jadwal Praktik Hari --}}
                             <div class="form-group mb-3">
@@ -101,7 +100,7 @@
                                 @enderror
                             </div>
 
-                            {{-- Jadwal Praktik Waktu - TEXT INPUT --}}
+                            {{-- Jadwal Praktik Waktu --}}
                             <div class="form-group mb-3">
                                 <label for="jadwal_praktik_waktu">Jadwal Praktik (Waktu) <span
                                         class="text-danger">*</span></label>

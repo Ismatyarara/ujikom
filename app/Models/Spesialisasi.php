@@ -12,7 +12,7 @@ class Spesialisasi extends Model
     protected $table = 'spesialisasi';
 
     protected $fillable = [
-        'name',
+        'name','foto',
     ];
 
     // Relationships
@@ -20,4 +20,12 @@ class Spesialisasi extends Model
     {
         return $this->hasMany(Dokter::class, 'id_spesialisasi');
     }
+
+    public function getFotoUrlAttribute()
+{
+    return $this->foto
+        ? asset('storage/' . $this->foto)
+        : asset('images/default-spesialisasi.png');
+}
+
 }

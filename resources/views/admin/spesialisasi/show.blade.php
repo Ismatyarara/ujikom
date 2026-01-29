@@ -7,21 +7,36 @@
   <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
+
+        {{-- Header --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h4 class="card-title mb-0">Detail Spesialisasi</h4>
           <div>
-            <a href="{{ route('admin.spesialisasi.edit', $spesialisasi->id) }}" class="btn btn-warning btn-sm">
+            <a href="{{ route('admin.spesialisasi.edit', $spesialisasi->id) }}"
+               class="btn btn-warning btn-sm">
               <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="{{ route('admin.spesialisasi.index') }}" class="btn btn-light btn-sm">
+            <a href="{{ route('admin.spesialisasi.index') }}"
+               class="btn btn-light btn-sm">
               <i class="fas fa-arrow-left"></i> Kembali
             </a>
           </div>
         </div>
 
+        {{-- Info Spesialisasi --}}
         <div class="row">
-          <div class="col-md-12">
-            <table class="table table-borderless">
+          <div class="col-md-3 text-center">
+            @if ($spesialisasi->foto)
+              <img src="{{ asset('storage/'.$spesialisasi->foto) }}"
+                   class="rounded mb-3"
+                   width="120">
+            @else
+              <span class="text-muted">Tidak ada foto</span>
+            @endif
+          </div>
+
+          <div class="col-md-9">
+            <table class="table table-borderless mb-0">
               <tbody>
                 <tr>
                   <td width="200"><strong>Nama Spesialisasi</strong></td>
@@ -44,20 +59,24 @@
           </div>
         </div>
 
-        @if($spesialisasi->dokter && $spesialisasi->dokter->count() > 0)
+        {{-- Daftar Dokter --}}
+        @if($spesialisasi->dokter && $spesialisasi->dokter->count())
         <hr>
-        <h5 class="mb-3">Daftar Dokter ({{ $spesialisasi->dokter->count() }})</h5>
+        <h5 class="mb-3">
+          Daftar Dokter ({{ $spesialisasi->dokter->count() }})
+        </h5>
+
         <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
               <tr>
                 <th>No</th>
                 <th>Foto</th>
                 <th>Nama Dokter</th>
                 <th>Email</th>
-                <th>Jadwal Praktik</th>
+                <th>Jadwal</th>
                 <th>Tempat Praktik</th>
-                <th>Aksi</th>
+                <th class="text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -65,18 +84,17 @@
               <tr>
                 <td>{{ $key + 1 }}</td>
                 <td>
-                  @if($dokter->foto)
-                    <img src="{{ asset('storage/' . $dokter->foto) }}" alt="Foto" class="rounded-circle" width="40" height="40">
-                  @else
-                    <img src="{{ asset('assets/images/faces/face1.jpg') }}" alt="Default" class="rounded-circle" width="40" height="40">
-                  @endif
+                  <img src="{{ $dokter->foto
+                        ? asset('storage/'.$dokter->foto)
+                        : asset('assets/images/faces/face1.jpg') }}"
+                       class="rounded-circle"
+                       width="40" height="40">
                 </td>
                 <td>
-                  <div>
-                    <strong>{{ $dokter->nama }}</strong>
-                    <br>
-                    <small class="text-muted">{{ $dokter->pengguna->name ?? '-' }}</small>
-                  </div>
+                  <strong>{{ $dokter->nama }}</strong><br>
+                  <small class="text-muted">
+                    {{ $dokter->pengguna->name ?? '-' }}
+                  </small>
                 </td>
                 <td>{{ $dokter->pengguna->email ?? '-' }}</td>
                 <td>
@@ -86,11 +104,13 @@
                   </small>
                 </td>
                 <td>{{ Str::limit($dokter->tempat_praktik, 25) }}</td>
-                <td>
-                  <a href="{{ route('admin.dokter.show', $dokter->id) }}" class="btn btn-info btn-sm" title="Detail">
+                <td class="text-center">
+                  <a href="{{ route('admin.dokter.show', $dokter->id) }}"
+                     class="btn btn-info btn-sm">
                     <i class="fas fa-eye"></i>
                   </a>
-                  <a href="{{ route('admin.dokter.edit', $dokter->id) }}" class="btn btn-warning btn-sm" title="Edit">
+                  <a href="{{ route('admin.dokter.edit', $dokter->id) }}"
+                     class="btn btn-warning btn-sm">
                     <i class="fas fa-edit"></i>
                   </a>
                 </td>
@@ -102,9 +122,11 @@
         @else
         <hr>
         <div class="alert alert-info">
-          <i class="fas fa-info-circle"></i> Belum ada dokter yang terdaftar pada spesialisasi ini.
+          <i class="fas fa-info-circle"></i>
+          Belum ada dokter pada spesialisasi ini.
         </div>
         @endif
+
       </div>
     </div>
   </div>

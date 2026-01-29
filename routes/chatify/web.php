@@ -40,6 +40,7 @@ Route::get('/download/{fileName}', 'MessagesController@download')->name(config('
  */
 Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('pusher.auth');
 
+
 /**
  * Make messages as seen
  */

@@ -1,81 +1,120 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+// ================= CONTROLLERS =================
 use App\Http\Controllers\Admin\ObatController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\ProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User\KonsultasiController;
 
+/*
+|--------------------------------------------------------------------------
+| PUBLIC
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Tambahkan baris ini untuk route login, register, dll
 Auth::routes();
 
 Route::get('/home', function () {
     return view('home');
 })->middleware(['auth', 'verified'])->name('home');
 
-// Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('dokter', App\Http\Controllers\Admin\DokterController::class);
-    Route::resource('users', App\Http\Controllers\Admin\UserController::class);
-   // Route pembelian HARUS di atas resource obat
-    Route::get('obat/pembelian', [ObatController::class, 'pembelian'])->name('obat.pembelian');
-    // Route Obat (resource)
-    Route::resource('obat', ObatController::class);
-    Route::get('obat/{id}', [ObatController::class, 'show'])->name('obat.show');
-    Route::resource('staff', App\Http\Controllers\Admin\StaffController::class);
-    Route::resource('spesialisasi', App\Http\Controllers\Admin\SpesialisasiController::class); 
-});
+/*
+|--------------------------------------------------------------------------
+| ADMIN
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-// ==================== DOKTER ROUTES ====================
-Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->name('dokter.')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])->name('dashboard');
-    // Route::resource('jadwal', App\Http\Controllers\Dokter\JadwalController::class);
-    // Route::resource('konsultasi', App\Http\Controllers\Dokter\KonsultasiController::class);
-    // Route::resource('chat', App\Http\Controllers\Dokter\ChatController::class);
-    // Route::resource('rekam-medis', App\Http\Controllers\Dokter\RekamMedisController::class);
-    // Route::resource('obat', App\Http\Controllers\Dokter\ObatController::class)->only(['index', 'show']);
-    // Route::resource('laporan', App\Http\Controllers\Dokter\LaporanController::class)->only(['index']);
-    // Route::get('/profile', [App\Http\Controllers\Dokter\ProfileController::class, 'index'])->name('profile');
-    // Route::put('/profile', [App\Http\Controllers\Dokter\ProfileController::class, 'update'])->name('profile.update');
-});
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            ->name('dashboard');
 
-// Staff Routes
-Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
-   Route::get('/dashboard', [App\Http\Controllers\Staff\DashboardController::class, 'index'])->name('dashboard');
-    // Penjualan Obat (Lihat Penjualan Obat)
-    Route::resource('penjualan', App\Http\Controllers\Staff\PenjualanController::class)->only(['index', 'create', 'store', 'show']);
-    // Data Pembelian Obat (Read-only - Lihat Data Pembelian Obat)
-    Route::resource('pembelian', App\Http\Controllers\Staff\PembelianController::class)->only(['index', 'show']);
-    // Barang Masuk (Manage Barang Masuk)
-    Route::resource('barang-masuk', App\Http\Controllers\Staff\BarangMasukController::class);
-    // Barang Keluar (Manage Barang Keluar)
-    Route::resource('barang-keluar', App\Http\Controllers\Staff\BarangKeluarController::class);
-     Route::resource('obat', App\Http\Controllers\Staff\ObatController::class);
-});
+        Route::resource('dokter', App\Http\Controllers\Admin\DokterController::class);
+        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
+        Route::get('obat/pembelian', [ObatController::class, 'pembelian'])
+            ->name('obat.pembelian');
 
-
-Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
-    
-    // Dashboard - ada pengecekan profile di controller
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Profile Routes
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/', [ProfileController::class, 'show'])->name('show');
-        Route::get('/create', [ProfileController::class, 'create'])->name('create');
-        Route::post('/', [ProfileController::class, 'store'])->name('store');
-        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
-        Route::put('/', [ProfileController::class, 'update'])->name('update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+        Route::resource('obat', ObatController::class);
+        Route::resource('staff', App\Http\Controllers\Admin\StaffController::class);
+        Route::resource('spesialisasi', App\Http\Controllers\Admin\SpesialisasiController::class);
     });
 
-});
+/*
+|--------------------------------------------------------------------------
+| DOKTER
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:dokter'])
+    ->prefix('dokter')
+    ->name('dokter.')
+    ->group(function () {
 
+        Route::get('/dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])
+            ->name('dashboard');
+    });
 
+/*
+|--------------------------------------------------------------------------
+| STAFF
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:staff'])
+    ->prefix('staff')
+    ->name('staff.')
+    ->group(function () {
 
+        Route::get('/dashboard', [App\Http\Controllers\Staff\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::resource('penjualan', App\Http\Controllers\Staff\PenjualanController::class)
+            ->only(['index', 'create', 'store', 'show']);
+
+        Route::resource('pembelian', App\Http\Controllers\Staff\PembelianController::class)
+            ->only(['index', 'show']);
+
+        Route::resource('barang-masuk', App\Http\Controllers\Staff\BarangMasukController::class);
+        Route::resource('barang-keluar', App\Http\Controllers\Staff\BarangKeluarController::class);
+        Route::resource('obat', App\Http\Controllers\Staff\ObatController::class);
+    });
+
+/*
+|--------------------------------------------------------------------------
+| USER
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:user'])
+    ->prefix('user')
+    ->name('user.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Profile
+        Route::prefix('profile')
+            ->name('profile.')
+            ->group(function () {
+                Route::get('/', [ProfileController::class, 'show'])->name('show');
+                Route::get('/create', [ProfileController::class, 'create'])->name('create');
+                Route::post('/', [ProfileController::class, 'store'])->name('store');
+                Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+                Route::put('/', [ProfileController::class, 'update'])->name('update');
+                Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+            });
+
+     
+
+            Route::resource('konsultasi',KonsultasiController::class);
+    });
+
+    

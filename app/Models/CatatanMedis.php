@@ -12,15 +12,16 @@ class CatatanMedis extends Model
     protected $table = 'catatan_medis';
 
     protected $fillable = [
-        'title',
+        'user_id',
+        'dokter_id',
+        'keluhan',
+        'diagnosa',
         'deskripsi',
-        'diagnosa_ringan',
-        'saran_pengobatan',
         'tanggal_catatan',
     ];
 
-    protected $casts = [
-        'tanggal_catatan' => 'date',
+      protected $casts = [
+        'tanggal_catatan' => 'datetime',
     ];
 
     // Scope untuk filter catatan terbaru

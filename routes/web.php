@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ObatController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\KonsultasiController;
+use App\Http\Controllers\Dokter\DokterDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,14 +54,21 @@ Route::middleware(['auth', 'role:admin'])
 | DOKTER
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:dokter'])
-    ->prefix('dokter')
-    ->name('dokter.')
-    ->group(function () {
 
-        Route::get('/dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])
+use App\Http\Controllers\Dokter\DokterKonsultasiController;
+
+
+// Route Dokter
+Route::middleware(['auth'])->prefix('dokter')->name('dokter.')->group(function () {
+   
+        Route::get('/dashboard', [DokterDashboardController::class, 'index'])
             ->name('dashboard');
-    });
+
+    
+    // Konsultasi
+    Route::get('/konsultasi', [DokterKonsultasiController::class, 'index'])->name('konsultasi.index');
+    Route::get('/konsultasi/{user}', [DokterKonsultasiController::class, 'show'])->name('konsultasi.show');
+});
 
 /*
 |--------------------------------------------------------------------------

@@ -9,55 +9,70 @@ use App\Models\Spesialisasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class DokterController extends Controller
 {
     public function index()
     {
-        $dokters = Dokter::with(['pengguna', 'spesialisasi'])->paginate(10); 
+        $dokters = Dokter::with(['pengguna', 'spesialisasi'])->paginate(10);
         return view('admin.dokter.index', compact('dokters'));
     }
 
     public function create()
     {
-        $spesialisasi = Spesialisasi::all();
-        return view('admin.dokter.create', compact('spesialisasi'));
+        return view('admin.dokter.create', [
+            'spesialisasi' => Spesialisasi::all()
+        ]);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'nama' => 'required|string|max:255',
-            'id_spesialisasi' => 'required|exists:spesialisasi,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'jadwal_praktik_hari' => 'required|string',
-            'jadwal_praktik_waktu' => 'required|string',
-            'tempat_praktik' => 'required|string',
+            'nama' => 'required',
+            'spesialisasi_id' => 'required|exists:spesialisasi,id',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'jadwal_praktik_hari' => 'required',
+            'jadwal_praktik_waktu' => 'required',
+            'tempat_praktik' => 'required',
+            'pengalaman' => 'nullable',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'nama.required' => 'Nama dokter wajib diisi.',
+            'spesialisasi_id.required' => 'Spesialisasi wajib dipilih.',
+            'tempat_praktik.required' => 'Tempat praktik wajib diisi.',
         ]);
 
-        // Create user - PERBAIKAN: gunakan 'nama' bukan 'name'
         $user = User::create([
-            'name' => $validated['nama'], // FIX: gunakan 'nama' dari validated
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'name' => $data['nama'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
             'role' => 'dokter',
             'email_verified_at' => now(),
         ]);
 
-        // Create dokter
         Dokter::create([
-            'id_user' => $user->id,
-            'nama' => $validated['nama'],
-            'id_spesialisasi' => $validated['id_spesialisasi'],
-            'foto' => $request->hasFile('foto') ? $request->file('foto')->store('dokter', 'public') : null,
-            'jadwal_praktik_hari' => $validated['jadwal_praktik_hari'],
-            'jadwal_praktik_waktu' => $validated['jadwal_praktik_waktu'],
-            'tempat_praktik' => $validated['tempat_praktik'],
+            'user_id' => $user->id,
+            'nama' => $data['nama'],
+            'spesialisasi_id' => $data['spesialisasi_id'],
+            'foto' => $request->hasFile('foto')
+                ? $request->file('foto')->store('dokter', 'public')
+                : null,
+            'jadwal_praktik_hari' => $data['jadwal_praktik_hari'],
+            'jadwal_praktik_waktu' => $data['jadwal_praktik_waktu'],
+            'tempat_praktik' => $data['tempat_praktik'],
+            'pengalaman' => $data['pengalaman'] ?? null,
         ]);
 
-        return redirect()->route('admin.dokter.index')->with('success', 'Dokter berhasil ditambahkan');
+        return redirect()
+            ->route('admin.dokter.index')
+            ->with('success', 'Dokter berhasil ditambahkan.');
     }
 
     public function show(Dokter $dokter)
@@ -68,63 +83,73 @@ class DokterController extends Controller
 
     public function edit(Dokter $dokter)
     {
-        $spesialisasi = Spesialisasi::all();
         $dokter->load('pengguna');
-        return view('admin.dokter.edit', compact('dokter', 'spesialisasi'));
+
+        return view('admin.dokter.edit', [
+            'dokter' => $dokter,
+            'spesialisasi' => Spesialisasi::all()
+        ]);
     }
 
     public function update(Request $request, Dokter $dokter)
     {
-        $validated = $request->validate([
-            'email' => 'required|email|unique:users,email,' . $dokter->id_user,
+        $data = $request->validate([
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($dokter->user_id),
+            ],
             'password' => 'nullable|min:8',
-            'nama' => 'required|string|max:255',
-            'id_spesialisasi' => 'required|exists:spesialisasi,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'jadwal_praktik_hari' => 'required|string',
-            'jadwal_praktik_waktu' => 'required|string',
-            'tempat_praktik' => 'required|string',
+            'nama' => 'required',
+            'spesialisasi_id' => 'required|exists:spesialisasi,id',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'jadwal_praktik_hari' => 'required',
+            'jadwal_praktik_waktu' => 'required',
+            'tempat_praktik' => 'required',
+            'pengalaman' => 'nullable',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'nama.required' => 'Nama dokter wajib diisi.',
+            'spesialisasi_id.required' => 'Spesialisasi wajib dipilih.',
         ]);
 
-        // Update user - PERBAIKAN: gunakan 'nama' bukan 'name'
         $dokter->pengguna->update([
-            'name' => $validated['nama'], // FIX: gunakan 'nama' dari validated
-            'email' => $validated['email'],
-            'password' => $request->filled('password') ? Hash::make($validated['password']) : $dokter->pengguna->password,
+            'name' => $data['nama'],
+            'email' => $data['email'],
+            'password' => $request->filled('password')
+                ? Hash::make($data['password'])
+                : $dokter->pengguna->password,
         ]);
 
-        // Prepare dokter data
-        $dokterData = [
-            'nama' => $validated['nama'],
-            'id_spesialisasi' => $validated['id_spesialisasi'],
-            'jadwal_praktik_hari' => $validated['jadwal_praktik_hari'],
-            'jadwal_praktik_waktu' => $validated['jadwal_praktik_waktu'],
-            'tempat_praktik' => $validated['tempat_praktik'],
-        ];
-
-        // Handle foto upload
         if ($request->hasFile('foto')) {
             if ($dokter->foto) {
                 Storage::disk('public')->delete($dokter->foto);
             }
-            $dokterData['foto'] = $request->file('foto')->store('dokter', 'public');
+            $data['foto'] = $request->file('foto')->store('dokter', 'public');
         }
 
-        $dokter->update($dokterData);
+        unset($data['email'], $data['password']);
 
-        return redirect()->route('admin.dokter.index')->with('success', 'Data dokter berhasil diupdate');
+        $dokter->update($data);
+
+        return redirect()
+            ->route('admin.dokter.index')
+            ->with('success', 'Data dokter berhasil diperbarui.');
     }
 
     public function destroy(Dokter $dokter)
     {
-        // Delete foto if exists
         if ($dokter->foto) {
             Storage::disk('public')->delete($dokter->foto);
         }
-        
-        // Delete user (cascade will delete dokter)
+
         $dokter->pengguna->delete();
-        
-        return redirect()->route('admin.dokter.index')->with('success', 'Dokter berhasil dihapus');
+
+        return redirect()
+            ->route('admin.dokter.index')
+            ->with('success', 'Dokter berhasil dihapus.');
     }
 }

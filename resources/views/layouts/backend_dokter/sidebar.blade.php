@@ -4,7 +4,6 @@
     @auth
     @if(auth()->user()->role === 'dokter')
 
-    <!-- Dashboard -->
     <li class="nav-item {{ request()->routeIs('dokter.dashboard') ? 'active' : '' }}">
       <a class="nav-link" href="{{ route('dokter.dashboard') }}">
         <i class="icon-grid menu-icon"></i>
@@ -12,25 +11,33 @@
       </a>
     </li>
 
-    {{-- <!-- Konsultasi -->
+    {{-- Menu Chat/Konsultasi --}}
+    <li class="nav-item {{ request()->is('chat*') ? 'active' : '' }}">
+      <a class="nav-link" href="{{ url('/chat') }}">
+        <i class="icon-bubble menu-icon"></i>
+        <span class="menu-title">Pesan Konsultasi</span>
+        {{-- Badge notifikasi unread (opsional) --}}
+        <span class="badge badge-danger badge-pill ml-auto" id="unread-count" style="display: none;">0</span>
+      </a>
+    </li>
+
     <li class="nav-item {{ request()->routeIs('dokter.konsultasi*') ? 'active' : '' }}">
       <a class="nav-link" href="{{ route('dokter.konsultasi.index') }}">
         <i class="icon-paper menu-icon"></i>
-        <span class="menu-title">Konsultasi</span>
+        <span class="menu-title">Daftar Pasien</span>
       </a>
-    </li> --}}
+    </li>
 
     @endif
     @endauth
 
-    <!-- Logout -->
     <li class="nav-item">
       <a class="nav-link" href="{{ route('logout') }}"
-        onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
+         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         <i class="icon-power menu-icon"></i>
         <span class="menu-title">Logout</span>
       </a>
-      <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" class="d-none">
+      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
         @csrf
       </form>
     </li>

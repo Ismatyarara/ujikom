@@ -33,6 +33,7 @@
                   <th>Nama</th>
                   <th>Email</th>
                   <th>Spesialisasi</th>
+                  <th>Pengalaman</th>
                   <th>Tempat Praktik</th>
                   <th>Jadwal</th>
                   <th>Aksi</th>
@@ -50,6 +51,11 @@
                     <td>{{ $dokter->nama }}</td>
                     <td>{{ $dokter->pengguna->email ?? '-' }}</td>
                     <td>{{ $dokter->spesialisasi->name ?? '-' }}</td>
+                    <td>
+                      <small>
+                        {{ Str::limit($dokter->pengalaman ?? '-', 50) }}
+                      </small>
+                    </td>
                     <td>{{ $dokter->tempat_praktik }}</td>
                     <td>
                       <small>
@@ -81,7 +87,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="8" class="text-center">Tidak ada data dokter</td>
+                    <td colspan="9" class="text-center">Tidak ada data dokter</td>
                   </tr>
                 @endforelse
               </tbody>

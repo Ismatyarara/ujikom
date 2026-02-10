@@ -12,9 +12,10 @@ class Dokter extends Model
     protected $table = 'dokter';
 
     protected $fillable = [
-        'id_user',
+        'user_id',
         'nama',
-        'id_spesialisasi',
+        'spesialisasi_id',
+        'pengalaman',
         'foto',
         'jadwal_praktik_hari',
         'jadwal_praktik_waktu',
@@ -23,22 +24,20 @@ class Dokter extends Model
 
     protected $appends = ['foto_url'];
 
-    // Relasi
     public function pengguna()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function spesialisasi()
     {
-        return $this->belongsTo(Spesialisasi::class, 'id_spesialisasi');
+        return $this->belongsTo(Spesialisasi::class, 'spesialisasi_id');
     }
 
-    // Accessor untuk URL foto
     public function getFotoUrlAttribute()
     {
-        return $this->foto 
-            ? asset('storage/' . $this->foto) 
+        return $this->foto
+            ? asset('storage/' . $this->foto)
             : asset('assets/images/faces/face1.jpg');
     }
 }

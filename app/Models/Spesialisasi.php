@@ -18,7 +18,7 @@ class Spesialisasi extends Model
     // Relationships
     public function dokter()
     {
-        return $this->hasMany(Dokter::class, 'id_spesialisasi');
+        return $this->hasMany(Dokter::class, 'spesialisasi_id');
     }
 
     public function getFotoUrlAttribute()

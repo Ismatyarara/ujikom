@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 // ================= CONTROLLERS =================
 use App\Http\Controllers\Admin\ObatController;
+use App\Http\Controllers\Dokter\DataObatController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\KonsultasiController;
@@ -55,19 +56,31 @@ Route::middleware(['auth', 'role:admin'])
 |--------------------------------------------------------------------------
 */
 
+
+
+
 use App\Http\Controllers\Dokter\DokterKonsultasiController;
+use App\Http\Controllers\User\CatatanMedisController;
 
+Route::middleware(['auth'])
+    ->prefix('dokter')
+    ->name('dokter.')
+    ->group(function () {
 
-// Route Dokter
-Route::middleware(['auth'])->prefix('dokter')->name('dokter.')->group(function () {
-   
-        Route::get('/dashboard', [DokterDashboardController::class, 'index'])
-            ->name('dashboard');
+        Route::get('/dashboard', function () {
+            return view('dokter.dashboard');
+        })->name('dashboard');
 
-    
-    // Konsultasi
-    Route::get('/konsultasi', [DokterKonsultasiController::class, 'index'])->name('konsultasi.index');
-    Route::get('/konsultasi/{user}', [DokterKonsultasiController::class, 'show'])->name('konsultasi.show');
+        Route::get('/konsultasi',
+            [DokterKonsultasiController::class, 'index']
+        )->name('konsultasi.index');
+
+        Route::resource('catatan', \App\Http\Controllers\Dokter\CatatanMedisController::class);
+          // Data Obat (read-only)
+        Route::get('data-obat', [DataObatController::class, 'index'])->name('data-obat.index');
+        Route::get('data-obat/{id}', [DataObatController::class, 'show'])->name('data-obat.show');
+        
+  
 });
 
 /*
@@ -123,6 +136,8 @@ Route::middleware(['auth', 'role:user'])
      
 
             Route::resource('konsultasi',KonsultasiController::class);
+            Route::resource('catatan', CatatanMedisController::class);
+            
     });
 
     

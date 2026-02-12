@@ -141,7 +141,7 @@
 
                                     {{-- Button Chat --}}
                                     <div class="mt-auto">
-                                        <a href="{{ url('Chat/' . $dokter->id_user) }}"
+                                        <a href="{{ route('user', $dokter->pengguna->id) }}"
                                            class="btn btn-success w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
                                             <i class="bi bi-chat-dots-fill"></i>
                                             Mulai Konsultasi

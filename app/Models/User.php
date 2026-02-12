@@ -41,7 +41,7 @@ class User extends Authenticatable
 
     public function dokter()
     {
-        return $this->hasOne(Dokter::class, 'id_user');
+        return $this->hasOne(Dokter::class, 'user_id');
     }
 
     public function jadwal()

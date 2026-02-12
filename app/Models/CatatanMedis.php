@@ -30,4 +30,14 @@ class CatatanMedis extends Model
         return $query->whereDate('tanggal_catatan', '>=', now()->subDays($hari))
                      ->orderBy('tanggal_catatan', 'desc');
     }
+    public function user()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
+
+ public function dokter()
+{
+    // Catatan Medis "MILIK" (belongsTo) seorang Dokter melalui kolom dokter_id
+    return $this->belongsTo(Dokter::class, 'dokter_id');
+}
 }

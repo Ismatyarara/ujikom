@@ -51,16 +51,18 @@
                 @endphp
 
                 @if ($isProfileComplete)
+                    <!-- Konsultasi -->
                     <li class="nav-item {{ request()->routeIs('user.konsultasi*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.konsultasi.index') }}">
-                            <i class="icon-speech menu-icon"></i>
+                            <i class="fas fa-comment-medical menu-icon"></i>
                             <span class="menu-title">Konsultasi</span>
                         </a>
                     </li>
-                    </li>
-                    <li class="nav-item }">
-                        <a class="nav-link" href="#">
-                            <i class="icon-doc menu-icon"></i>
+
+                    <!-- Catatan Medis -->
+                    <li class="nav-item {{ request()->routeIs('user.catatan*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('user.catatan.index') }}">
+                            <i class="fas fa-file-medical-alt menu-icon"></i>
                             <span class="menu-title">Catatan Medis</span>
                         </a>
                     </li>

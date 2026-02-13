@@ -60,6 +60,8 @@ Route::middleware(['auth', 'role:admin'])
 
 
 use App\Http\Controllers\Dokter\DokterKonsultasiController;
+use App\Http\Controllers\Dokter\JadwalController;
+use App\Http\Controllers\Dokter\JadwalObatController;
 use App\Http\Controllers\User\CatatanMedisController;
 
 Route::middleware(['auth'])
@@ -79,7 +81,9 @@ Route::middleware(['auth'])
           // Data Obat (read-only)
         Route::get('data-obat', [DataObatController::class, 'index'])->name('data-obat.index');
         Route::get('data-obat/{id}', [DataObatController::class, 'show'])->name('data-obat.show');
-        
+        Route::resource('jadwal', JadwalController::class);
+        Route::resource('jadwal_obat_waktu', JadwalObatController::class);
+
   
 });
 

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Jadwal extends Model
 {
@@ -12,31 +12,49 @@ class Jadwal extends Model
     protected $table = 'jadwal';
 
     protected $fillable = [
-        'pengguna_id',
-        'waktu_minum',
+        'user_id',
+        'dokter_id',
+        'catatan_medis_id',
+        'nama_obat',
+        'deskripsi',
+        'tanggal_mulai',
+        'tanggal_selesai',
+        'status',
         'status_pengingat',
     ];
 
     protected $casts = [
-        'waktu_minum' => 'datetime:H:i',
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date',
         'status_pengingat' => 'boolean',
     ];
 
-    // Relasi
-    public function pengguna()
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI
+    |--------------------------------------------------------------------------
+    */
+
+
+    // Jadwal terkait Catatan Medis
+    public function catatanMedis()
     {
-        return $this->belongsTo(User::class, 'pengguna_id');
+        return $this->belongsTo(\App\Models\CatatanMedis::class);
     }
 
-    // Scope untuk filter jadwal aktif
-    public function scopeAktif($query)
+    // Relasi ke waktu obat
+    public function waktuObat()
     {
-        return $query->where('status_pengingat', 1);
+        return $this->hasMany(JadwalObatWaktu::class, 'jadwal_obat_id');
     }
 
-    // Scope untuk filter jadwal yang akan datang
-    public function scopeAkanDatang($query)
+    public function user()
     {
-        return $query->where('waktu_minum', '>=', now()->format('H:i'));
+        return $this->belongsTo(User::class);
+    }
+
+    public function dokter()
+    {
+        return $this->belongsTo(Dokter::class);
     }
 }

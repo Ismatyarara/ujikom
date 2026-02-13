@@ -34,6 +34,14 @@
                     </a>
                 </li>
 
+                <!-- Jadwal Obat -->
+                <li class="nav-item {{ request()->routeIs('dokter.jadwal*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('dokter.jadwal.create') }}">
+                        <i class="icon-clock menu-icon"></i>
+                        <span class="menu-title">Jadwal Obat</span>
+                    </a>
+                </li>
+
                 <li class="nav-item nav-category">
                     <span class="nav-link">Akun</span>
                 </li>

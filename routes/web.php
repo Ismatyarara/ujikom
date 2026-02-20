@@ -63,6 +63,7 @@ use App\Http\Controllers\Dokter\DokterKonsultasiController;
 use App\Http\Controllers\Dokter\JadwalController;
 use App\Http\Controllers\Dokter\JadwalObatController;
 use App\Http\Controllers\User\CatatanMedisController;
+use App\Http\Controllers\user\UserJadwalController;
 
 Route::middleware(['auth'])
     ->prefix('dokter')
@@ -81,8 +82,20 @@ Route::middleware(['auth'])
           // Data Obat (read-only)
         Route::get('data-obat', [DataObatController::class, 'index'])->name('data-obat.index');
         Route::get('data-obat/{id}', [DataObatController::class, 'show'])->name('data-obat.show');
-        Route::resource('jadwal', JadwalController::class);
-        Route::resource('jadwal_obat_waktu', JadwalObatController::class);
+     
+    Route::resource('jadwal', JadwalController::class);
+    Route::resource('jadwal_obat_waktu', JadwalObatController::class)->only(['store', 'destroy']);
+
+    // Tambah ini
+    Route::post('jadwal/{id}/waktu', [JadwalObatController::class, 'store'])
+        ->name('jadwal.waktu.store');
+    Route::delete('jadwal/waktu/{id}', [JadwalObatController::class, 'destroy'])
+        ->name('jadwal.waktu.destroy');
+
+    // 2 route ini tidak di-cover resource, harus manual
+    Route::get ('jadwal/{id}/waktu', [JadwalController::class, 'createWaktu'])->name('jadwal.waktu.create');
+    Route::post('jadwal/{id}/waktu', [JadwalController::class, 'storeWaktu']) ->name('jadwal.waktu.store');
+
 
   
 });
@@ -137,10 +150,12 @@ Route::middleware(['auth', 'role:user'])
                 Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
             });
 
-     
-
             Route::resource('konsultasi',KonsultasiController::class);
             Route::resource('catatan', CatatanMedisController::class);
+
+
+        Route::get('jadwal', [UserJadwalController::class, 'index'])->name('jadwal.index');
+        Route::get('jadwal/{id}', [UserJadwalController::class, 'show'])->name('jadwal.show');
             
     });
 

@@ -22,83 +22,44 @@
     border-radius: 14px;
     box-shadow: 0 4px 15px rgba(0,0,0,.05);
     overflow: hidden;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 .card-header {
     background: linear-gradient(135deg, #2563eb, #1e40af);
-    padding: 25px;
+    padding: 22px 25px;
     color: #fff;
 }
 .card-header h2 {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 4px;
-}
-.card-header p {
-    font-size: 13px;
-    opacity: .8;
+    margin-bottom: 6px;
 }
 .status-badge {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 3px 12px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    margin-top: 10px;
 }
 .aktif { background: #dcfce7; color: #166534; }
 .nonaktif { background: #fee2e2; color: #991b1b; }
-.card-body {
-    padding: 25px;
-}
+.card-body { padding: 20px 25px; }
 .info-row {
     display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
     border-bottom: 1px solid #f1f5f9;
     font-size: 14px;
 }
 .info-row:last-child { border-bottom: none; }
-.info-row .label {
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.info-row .value {
-    font-weight: 600;
-    color: #1e293b;
-    text-align: right;
-}
-.jam-section h3 {
-    font-size: 15px;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 15px;
-}
-.jam-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-}
-.jam-card {
-    background: #eff6ff;
-    border: 2px solid #bfdbfe;
-    border-radius: 10px;
-    padding: 12px;
+.info-row i {
+    color: #2563eb;
+    width: 16px;
     text-align: center;
 }
-.jam-card i {
-    color: #2563eb;
-    font-size: 16px;
-    margin-bottom: 6px;
-    display: block;
-}
-.jam-card span {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1e3a8a;
-}
+.info-row .label { color: #64748b; flex: 1; }
+.info-row .value { font-weight: 600; color: #1e293b; }
 .catatan-box {
     background: #fefce8;
     border-left: 4px solid #facc15;
@@ -106,7 +67,35 @@
     padding: 14px;
     font-size: 13px;
     color: #713f12;
+    line-height: 1.6;
 }
+.jam-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.jam-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.jam-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    border: 1.5px solid #bfdbfe;
+    color: #1e40af;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+}
+.jam-badge i { font-size: 12px; color: #2563eb; }
 .empty-jam {
     text-align: center;
     padding: 20px;
@@ -120,28 +109,29 @@
         <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Jadwal
     </a>
 
-    {{-- Card Header --}}
+    {{-- Header --}}
     <div class="card">
         <div class="card-header">
             <h2><i class="fa-solid fa-pills"></i> {{ $jadwal->nama_obat }}</h2>
-            <p>Diresepkan oleh dr. {{ $jadwal->dokter->nama }}</p>
             <span class="status-badge {{ $jadwal->status == 'aktif' ? 'aktif' : 'nonaktif' }}">
                 {{ ucfirst($jadwal->status) }}
             </span>
         </div>
-
         <div class="card-body">
             <div class="info-row">
-                <div class="label"><i class="fa-solid fa-calendar-day"></i> Tanggal Mulai</div>
-                <div class="value">{{ $jadwal->tanggal_mulai->format('d M Y') }}</div>
+                <i class="fa-solid fa-user-doctor"></i>
+                <span class="label">Dokter</span>
+                <span class="value">dr. {{ $jadwal->dokter->nama }}</span>
             </div>
             <div class="info-row">
-                <div class="label"><i class="fa-solid fa-calendar-check"></i> Tanggal Selesai</div>
-                <div class="value">{{ $jadwal->tanggal_selesai->format('d M Y') }}</div>
+                <i class="fa-solid fa-calendar-day"></i>
+                <span class="label">Tanggal Mulai</span>
+                <span class="value">{{ $jadwal->tanggal_mulai->format('d M Y') }}</span>
             </div>
             <div class="info-row">
-                <div class="label"><i class="fa-solid fa-user-doctor"></i> Dokter</div>
-                <div class="value">dr. {{ $jadwal->dokter->nama }}</div>
+                <i class="fa-solid fa-calendar-check"></i>
+                <span class="label">Tanggal Selesai</span>
+                <span class="value">{{ $jadwal->tanggal_selesai->format('d M Y') }}</span>
             </div>
         </div>
     </div>
@@ -151,8 +141,7 @@
     <div class="card">
         <div class="card-body">
             <div class="catatan-box">
-                <i class="fa-solid fa-note-sticky"></i>
-                <strong>Catatan Dokter:</strong><br>
+                <strong><i class="fa-solid fa-note-sticky"></i> Catatan Dokter:</strong><br>
                 {{ $jadwal->deskripsi }}
             </div>
         </div>
@@ -161,16 +150,18 @@
 
     {{-- Jam Minum --}}
     <div class="card">
-        <div class="card-body jam-section">
-            <h3><i class="fa-solid fa-clock"></i> Jadwal Minum Obat</h3>
+        <div class="card-body">
+            <div class="jam-title">
+                <i class="fa-solid fa-clock"></i> Jadwal Minum Obat
+            </div>
 
             @if($jadwal->waktuObat->count())
-            <div class="jam-grid">
+            <div class="jam-list">
                 @foreach($jadwal->waktuObat->sortBy('waktu') as $w)
-                <div class="jam-card">
+                <span class="jam-badge">
                     <i class="fa-solid fa-bell"></i>
-                    <span>{{ \Carbon\Carbon::parse($w->waktu)->format('H:i') }}</span>
-                </div>
+                    {{ \Carbon\Carbon::parse($w->waktu)->format('H:i') }}
+                </span>
                 @endforeach
             </div>
             @else

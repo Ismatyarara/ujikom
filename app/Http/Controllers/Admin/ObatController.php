@@ -9,23 +9,21 @@ use Illuminate\Support\Facades\Storage;
 
 class ObatController extends Controller
 {
-    // Tampilkan data obat
     public function index()
     {
-        $obat = Obat::with('user')->paginate(10); 
+        $obat = Obat::with('user')->paginate(10);
         return view('admin.obat.index', compact('obat'));
     }
 
-   
     public function pembelian()
-{
-    $obat = Obat::paginate(10); // Hapus ->with('staff')
-    return view('admin.obat.pembelian', compact('obat'));
-}
+    {
+        $pembelian = Obat::paginate(10);
+        return view('admin.obat.pembelian', compact('pembelian'));
+    }
 
     public function show($id)
     {
-        $obat = Obat::with('staff')->findOrFail($id); 
+        $obat = Obat::findOrFail($id); // hapus with('staff')
         return view('admin.obat.show', compact('obat'));
     }
 }

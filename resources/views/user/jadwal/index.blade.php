@@ -7,172 +7,159 @@
     background: #f4f7ff;
     padding: 40px 20px;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    max-width: 600px;
-    margin: auto;
 }
-.back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+.top {
+    margin-bottom: 25px;
+}
+.top h2 {
+    font-size: 20px;
+    color: #1e3a8a;
+    font-weight: 700;
+}
+.top p {
     font-size: 13px;
-    color: #2563eb;
-    text-decoration: none;
-    margin-bottom: 20px;
+    color: #64748b;
+    margin-top: 4px;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
 }
 .card {
     background: #fff;
     border-radius: 14px;
+    padding: 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,.05);
-    overflow: hidden;
-    margin-bottom: 14px;
+    border-left: 4px solid #2563eb;
+    transition: transform .2s;
 }
-.card-header {
-    background: linear-gradient(135deg, #2563eb, #1e40af);
-    padding: 22px 25px;
-    color: #fff;
+.card:hover { transform: translateY(-2px); }
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
 }
-.card-header h2 {
-    font-size: 18px;
+.nama-obat {
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 6px;
+    color: #1e3a8a;
 }
-.status-badge {
-    display: inline-block;
-    padding: 3px 12px;
+.status {
+    padding: 4px 10px;
     border-radius: 20px;
     font-size: 11px;
     font-weight: 600;
 }
 .aktif { background: #dcfce7; color: #166534; }
 .nonaktif { background: #fee2e2; color: #991b1b; }
-.card-body { padding: 20px 25px; }
-.info-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 14px;
+.dokter {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 10px;
 }
-.info-row:last-child { border-bottom: none; }
-.info-row i {
+.periode {
+    font-size: 12px;
+    background: #eff6ff;
     color: #2563eb;
-    width: 16px;
-    text-align: center;
-}
-.info-row .label { color: #64748b; flex: 1; }
-.info-row .value { font-weight: 600; color: #1e293b; }
-.catatan-box {
-    background: #fefce8;
-    border-left: 4px solid #facc15;
-    border-radius: 8px;
-    padding: 14px;
-    font-size: 13px;
-    color: #713f12;
-    line-height: 1.6;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
 }
 .jam-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
 }
 .jam-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 15px;
 }
 .jam-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #eff6ff;
-    border: 1.5px solid #bfdbfe;
-    color: #1e40af;
-    padding: 7px 14px;
+    background: #e0e7ff;
+    color: #3730a3;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
 }
-.jam-badge i { font-size: 12px; color: #2563eb; }
-.empty-jam {
+.btn-detail {
+    display: block;
     text-align: center;
-    padding: 20px;
-    color: #94a3b8;
+    padding: 8px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
     font-size: 13px;
+    font-weight: 600;
 }
+.btn-detail:hover { background: #1d4ed8; color: #fff; }
+.empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+    background: #fff;
+    border-radius: 14px;
+}
+.empty i { font-size: 40px; color: #dbeafe; margin-bottom: 10px; display: block; }
 </style>
 
 <div class="wrap">
-    <a href="{{ route('user.jadwal.index') }}" class="back">
-        <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Jadwal
-    </a>
+    <div class="top">
+        <h2>Jadwal Obat Saya</h2>
+        <p>Daftar jadwal konsumsi obat yang diberikan dokter</p>
+    </div>
 
-    {{-- Header --}}
-    <div class="card">
-        <div class="card-header">
-            <h2><i class="fa-solid fa-pills"></i> {{ $jadwal->nama_obat }}</h2>
-            <span class="status-badge {{ $jadwal->status == 'aktif' ? 'aktif' : 'nonaktif' }}">
-                {{ ucfirst($jadwal->status) }}
-            </span>
-        </div>
-        <div class="card-body">
-            <div class="info-row">
+    @if($jadwals->count())
+    <div class="grid">
+        @foreach($jadwals as $jadwal)
+        <div class="card">
+            <div class="card-top">
+                <div class="nama-obat">{{ $jadwal->nama_obat }}</div>
+                <span class="status {{ $jadwal->status == 'aktif' ? 'aktif' : 'nonaktif' }}">
+                    {{ ucfirst($jadwal->status) }}
+                </span>
+            </div>
+
+            <div class="dokter">
                 <i class="fa-solid fa-user-doctor"></i>
-                <span class="label">Dokter</span>
-                <span class="value">dr. {{ $jadwal->dokter->nama }}</span>
+                dr. {{ $jadwal->dokter->nama }}
             </div>
-            <div class="info-row">
-                <i class="fa-solid fa-calendar-day"></i>
-                <span class="label">Tanggal Mulai</span>
-                <span class="value">{{ $jadwal->tanggal_mulai->format('d M Y') }}</span>
-            </div>
-            <div class="info-row">
-                <i class="fa-solid fa-calendar-check"></i>
-                <span class="label">Tanggal Selesai</span>
-                <span class="value">{{ $jadwal->tanggal_selesai->format('d M Y') }}</span>
-            </div>
-        </div>
-    </div>
 
-    {{-- Catatan --}}
-    @if($jadwal->deskripsi)
-    <div class="card">
-        <div class="card-body">
-            <div class="catatan-box">
-                <strong><i class="fa-solid fa-note-sticky"></i> Catatan Dokter:</strong><br>
-                {{ $jadwal->deskripsi }}
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- Jam Minum --}}
-    <div class="card">
-        <div class="card-body">
-            <div class="jam-title">
-                <i class="fa-solid fa-clock"></i> Jadwal Minum Obat
+            <div class="periode">
+                <i class="fa-solid fa-calendar-days"></i>
+                {{ $jadwal->tanggal_mulai->format('d M Y') }}
+                —
+                {{ $jadwal->tanggal_selesai->format('d M Y') }}
             </div>
 
             @if($jadwal->waktuObat->count())
+            <div class="jam-title"><i class="fa-solid fa-clock"></i> Jadwal Minum</div>
             <div class="jam-list">
-                @foreach($jadwal->waktuObat->sortBy('waktu') as $w)
+                @foreach($jadwal->waktuObat as $w)
                 <span class="jam-badge">
-                    <i class="fa-solid fa-bell"></i>
                     {{ \Carbon\Carbon::parse($w->waktu)->format('H:i') }}
                 </span>
                 @endforeach
             </div>
-            @else
-            <div class="empty-jam">
-                <i class="fa-solid fa-clock"></i>
-                <p>Belum ada jadwal waktu minum.</p>
-            </div>
             @endif
+
+            <a href="{{ route('user.jadwal.show', $jadwal->id) }}" class="btn-detail">
+                Lihat Detail
+            </a>
         </div>
+        @endforeach
     </div>
+    @else
+    <div class="empty">
+        <i class="fa-solid fa-pills"></i>
+        <p>Belum ada jadwal obat dari dokter.</p>
+    </div>
+    @endif
 </div>
 @endsection

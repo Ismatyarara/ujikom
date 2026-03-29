@@ -6,12 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\JadwalObatWaktu;
 use Illuminate\Http\Request;
 
-class JadwalObatController extends Controller
+class JadwalObatWaktuController extends Controller
 {
-    /**
-     * Tambah satu waktu minum ke jadwal tertentu.
-     * Dipanggil via route: dokter.jadwal.waktu.store (dengan $jadwalId dari route param).
-     */
     public function store(Request $request, $jadwalId)
     {
         $request->validate([
@@ -20,7 +16,6 @@ class JadwalObatController extends Controller
         ]);
 
         foreach ($request->waktu as $waktu) {
-            // Cegah duplikat
             JadwalObatWaktu::firstOrCreate([
                 'jadwal_obat_id' => $jadwalId,
                 'waktu'          => $waktu,
@@ -30,14 +25,11 @@ class JadwalObatController extends Controller
         return back()->with('success', 'Waktu minum obat berhasil ditambahkan.');
     }
 
-    /**
-     * Hapus satu waktu minum obat berdasarkan ID-nya.
-     */
     public function destroy($id)
     {
         $waktu = JadwalObatWaktu::findOrFail($id);
         $waktu->delete();
 
-        return back()->with('success', 'Waktu minum obat berhasil dihapus.');
+        return back()->with('success', 'Waktu berhasil dihapus');
     }
 }

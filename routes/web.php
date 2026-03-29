@@ -20,6 +20,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+use App\Http\Controllers\GoogleAuthController;
+Route::get('/auth/google',          [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+
 Auth::routes();
 
 Route::get('/home', function () {
@@ -61,9 +65,9 @@ Route::middleware(['auth', 'role:admin'])
 
 use App\Http\Controllers\Dokter\DokterKonsultasiController;
 use App\Http\Controllers\Dokter\JadwalController;
-use App\Http\Controllers\Dokter\JadwalObatController;
 use App\Http\Controllers\User\CatatanMedisController;
 use App\Http\Controllers\user\UserJadwalController;
+use App\Http\Controllers\Dokter\JadwalObatWaktuController; 
 
 Route::middleware(['auth'])
     ->prefix('dokter')
@@ -82,22 +86,19 @@ Route::middleware(['auth'])
           // Data Obat (read-only)
         Route::get('data-obat', [DataObatController::class, 'index'])->name('data-obat.index');
         Route::get('data-obat/{id}', [DataObatController::class, 'show'])->name('data-obat.show');
-     
-    Route::resource('jadwal', JadwalController::class);
-    Route::resource('jadwal_obat_waktu', JadwalObatController::class)->only(['store', 'destroy']);
+        Route::resource('jadwal', JadwalController::class);
+        
 
-    // Tambah ini
-    Route::post('jadwal/{id}/waktu', [JadwalObatController::class, 'store'])
-        ->name('jadwal.waktu.store');
-    Route::delete('jadwal/waktu/{id}', [JadwalObatController::class, 'destroy'])
-        ->name('jadwal.waktu.destroy');
+        Route::resource('jadwal', JadwalController::class);
 
-    // 2 route ini tidak di-cover resource, harus manual
-    Route::get ('jadwal/{id}/waktu', [JadwalController::class, 'createWaktu'])->name('jadwal.waktu.create');
-    Route::post('jadwal/{id}/waktu', [JadwalController::class, 'storeWaktu']) ->name('jadwal.waktu.store');
+        Route::get('jadwal/{id}/waktu', [JadwalController::class, 'createWaktu'])
+            ->name('jadwal.waktu.create');
+        Route::post('jadwal/{id}/waktu', [JadwalObatWaktuController::class, 'store'])
+            ->name('jadwal.waktu.store');
+        Route::delete('jadwal/waktu/{id}', [JadwalObatWaktuController::class, 'destroy'])
+    ->name('jadwal.waktu.destroy');
 
-
-  
+       
 });
 
 /*
@@ -159,4 +160,25 @@ Route::middleware(['auth', 'role:user'])
             
     });
 
-    
+    use App\Http\Controllers\TokoController;
+/*
+|--------------------------------------------------------------------------
+| TOKO
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:user'])
+    ->prefix('toko')
+    ->name('toko.')
+    ->group(function () {
+        Route::get('/', [TokoController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [TokoController::class, 'show'])->name('show');
+        Route::get('/keranjang', [TokoController::class, 'keranjang'])->name('keranjang');
+        Route::post('/keranjang/tambah', [TokoController::class, 'tambahKeranjang'])->name('tambahKeranjang');
+        Route::post('/keranjang/update', [TokoController::class, 'updateKeranjang'])->name('updateKeranjang');
+        Route::get('/keranjang/hapus/{id}', [TokoController::class, 'hapusKeranjang'])->name('hapusKeranjang');
+        Route::post('/beli-sekarang', [TokoController::class, 'beliSekarang'])->name('beliSekarang');
+        Route::get('/checkout', [TokoController::class, 'checkout'])->name('checkout');
+        Route::post('/checkout/proses', [TokoController::class, 'prosesCheckout'])->name('prosesCheckout');
+        Route::get('/riwayat', [TokoController::class, 'riwayat'])->name('riwayat');
+    });
+ 

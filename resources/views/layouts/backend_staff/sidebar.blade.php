@@ -46,7 +46,7 @@
         <li class="nav-item {{ request()->routeIs('staff.obat.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.obat.index') }}">
                 <i class="fas fa-pills menu-icon"></i>
-                <span class="menu-title">Data Obat</span>
+                <span class="menu-title">Mengelolah Obat</span>
             </a>
         </li>
 

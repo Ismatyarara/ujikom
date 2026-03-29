@@ -32,4 +32,5 @@ class JadwalObatWaktu extends Model
     {
         return $this->belongsTo(Jadwal::class, 'jadwal_obat_id');
     }
+    
 }

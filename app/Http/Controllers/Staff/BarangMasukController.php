@@ -28,29 +28,29 @@ class BarangMasukController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'id_obat' => 'required',
-            'jumlah' => 'required|numeric',
-            'tanggal_masuk' => 'required|date',
-            'tanggal_kadaluwarsa' => 'required|date',
-            'deskripsi' => 'nullable',
+            'id_obat'             => 'required|exists:obat,id',
+            'jumlah'              => 'required|integer|min:1',
+            'tanggal_masuk'       => 'required|date',
+            'tanggal_kadaluwarsa' => 'required|date|after:tanggal_masuk',
+            'deskripsi'           => 'nullable|string',
         ]);
 
         DB::transaction(function () use ($data) {
-
-            $data['kode'] = 'BM-' . time();
+            $data['kode'] = 'BM-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
             BarangMasuk::create($data);
 
-            // tambah stok
+            // Tambah stok obat
             Obat::where('id', $data['id_obat'])
                 ->increment('stok', $data['jumlah']);
         });
 
         return redirect()->route('staff.barang-masuk.index')
-            ->with('success', 'Barang masuk berhasil ditambahkan');
+            ->with('success', 'Barang masuk berhasil ditambahkan dan stok diperbarui.');
     }
 
     public function show(BarangMasuk $barangMasuk)
     {
+        $barangMasuk->load('obat');
         return view('staff.barang-masuk.show', compact('barangMasuk'));
     }
 
@@ -63,20 +63,27 @@ class BarangMasukController extends Controller
     public function update(Request $request, BarangMasuk $barangMasuk)
     {
         $data = $request->validate([
-            'id_obat' => 'required',
-            'jumlah' => 'required|numeric',
-            'tanggal_masuk' => 'required|date',
-            'tanggal_kadaluwarsa' => 'required|date',
-            'deskripsi' => 'nullable',
+            'id_obat'             => 'required|exists:obat,id',
+            'jumlah'              => 'required|integer|min:1',
+            'tanggal_masuk'       => 'required|date',
+            'tanggal_kadaluwarsa' => 'required|date|after:tanggal_masuk',
+            'deskripsi'           => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($data, $barangMasuk) {
+        // Validasi: kalau obat lama diubah, pastikan stok lama cukup untuk dikurangi
+        $obatLama = Obat::findOrFail($barangMasuk->id_obat);
+        if ($obatLama->stok < $barangMasuk->jumlah) {
+            return back()->withErrors([
+                'jumlah' => "Stok {$obatLama->nama_obat} sudah terpakai, tidak bisa mengedit data ini."
+            ])->withInput();
+        }
 
-            // balikin stok lama
+        DB::transaction(function () use ($data, $barangMasuk) {
+            // Kurangi stok obat lama (batalkan entry lama)
             Obat::where('id', $barangMasuk->id_obat)
                 ->decrement('stok', $barangMasuk->jumlah);
 
-            // tambah stok baru
+            // Tambah stok obat baru (bisa obat sama atau berbeda)
             Obat::where('id', $data['id_obat'])
                 ->increment('stok', $data['jumlah']);
 
@@ -84,13 +91,20 @@ class BarangMasukController extends Controller
         });
 
         return redirect()->route('staff.barang-masuk.index')
-            ->with('success', 'Barang masuk berhasil diupdate');
+            ->with('success', 'Barang masuk berhasil diupdate dan stok diperbarui.');
     }
 
     public function destroy(BarangMasuk $barangMasuk)
     {
-        DB::transaction(function () use ($barangMasuk) {
+        // Validasi stok cukup sebelum dihapus
+        $obat = Obat::findOrFail($barangMasuk->id_obat);
+        if ($obat->stok < $barangMasuk->jumlah) {
+            return back()->withErrors([
+                'error' => "Stok {$obat->nama_obat} sudah terpakai sebagian, tidak bisa menghapus data ini."
+            ]);
+        }
 
+        DB::transaction(function () use ($barangMasuk) {
             Obat::where('id', $barangMasuk->id_obat)
                 ->decrement('stok', $barangMasuk->jumlah);
 
@@ -98,6 +112,6 @@ class BarangMasukController extends Controller
         });
 
         return redirect()->route('staff.barang-masuk.index')
-            ->with('success', 'Barang masuk berhasil dihapus');
+            ->with('success', 'Barang masuk berhasil dihapus dan stok dikurangi.');
     }
 }

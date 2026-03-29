@@ -58,6 +58,13 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal berhasil dibuat! Silakan atur waktu minum obat.');
     }
 
+    public function show($id)
+{
+    $jadwal = Jadwal::with(['user', 'dokter', 'waktuObat'])->findOrFail($id);
+
+    return view('dokter.jadwal.show', compact('jadwal'));
+}
+
     /**
      * Form edit jadwal — tampilkan data lama + daftar waktu yang sudah ada.
      */

@@ -2,7 +2,6 @@
     <ul class="nav">
         @auth
             @if (Auth::user()->role == 'user')
-
                 <li class="nav-item {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('user.dashboard') }}">
                         <i class="icon-grid menu-icon"></i>
@@ -56,14 +55,46 @@
                             <span class="menu-title">Catatan Medis</span>
                         </a>
                     </li>
-                @endif
 
-                <li class="nav-item {{ request()->routeIs('user.jadwal*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('user.jadwal.index') }}">
-                        <i class="icon-clock menu-icon"></i>
-                        <span class="menu-title">Jadwal Obat</span>
-                    </a>
-                </li>
+
+                    <li class="nav-item {{ request()->routeIs('user.jadwal*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('user.jadwal.index') }}">
+                            <i class="icon-clock menu-icon"></i>
+                            <span class="menu-title">Jadwal Obat</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item {{ request()->routeIs('toko*') ? 'active' : '' }}">
+                        <a class="nav-link" data-toggle="collapse" href="#toko"
+                            aria-expanded="{{ request()->routeIs('toko*') ? 'true' : 'false' }}" aria-controls="toko">
+                            <i class="fas fa-store menu-icon"></i>
+                            <span class="menu-title">Toko Obat</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('toko*') ? 'show' : '' }}" id="toko">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('toko.index') ? 'active' : '' }}"
+                                        href="{{ route('toko.index') }}">
+                                        Beli Obat
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('toko.keranjang') ? 'active' : '' }}"
+                                        href="{{ route('toko.keranjang') }}">
+                                        Keranjang
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('toko.riwayat') ? 'active' : '' }}"
+                                        href="{{ route('toko.riwayat') }}">
+                                        Riwayat Transaksi
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endif
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('logout') }}"
@@ -75,7 +106,6 @@
                         @csrf
                     </form>
                 </li>
-
             @else
                 <li class="nav-item">
                     <div class="nav-link text-center">
@@ -97,6 +127,7 @@
                     </div>
                 </div>
             </li>
+
         @endauth
     </ul>
 </nav>

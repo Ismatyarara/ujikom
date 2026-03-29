@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h4 class="card-title mb-1">Data Pembelian Obat</h4>
-            <p class="text-muted mb-0">Riwayat transaksi pembelian obat</p>
+            <p class="text-muted mb-0">Riwayat pembelian obat</p>
           </div>
         </div>
 
@@ -21,10 +21,10 @@
           <div class="col-md-4">
             <form action="{{ route('admin.obat.pembelian') }}" method="GET">
               <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Cari kode/supplier..." value="{{ request('search') }}">
-                <button class="btn btn-primary" type="submit">
-                  <i class="fas fa-search"></i>
-                </button>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Cari nama obat..."
+                       value="{{ request('search') }}">
+                <button class="btn btn-primary" type="submit">Cari</button>
               </div>
             </form>
           </div>
@@ -36,13 +36,11 @@
             <thead class="table-light">
               <tr>
                 <th>No</th>
-                <th>Kode Pembelian</th>
-                <th>Tanggal</th>
-                <th>Supplier</th>
+                <th>Kode Obat</th>
                 <th>Nama Obat</th>
-                <th>Jumlah</th>
-                <th>Harga Satuan</th>
-                <th>Total</th>
+                <th>Satuan</th>
+                <th>Stok</th>
+                <th>Harga</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -50,28 +48,23 @@
               @forelse($pembelian as $key => $item)
               <tr>
                 <td>{{ $pembelian->firstItem() + $key }}</td>
-                <td><strong>{{ $item->kode_pembelian }}</strong></td>
-                <td>{{ \Carbon\Carbon::parse($item->tanggal_pembelian)->format('d-m-Y') }}</td>
-                <td>{{ $item->supplier_nama ?? 'Supplier A' }}</td>
-                <td>{{ $item->obat->nama_obat ?? '-' }}</td>
-                <td>{{ $item->jumlah }} {{ $item->obat->satuan ?? '' }}</td>
-                <td>Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}</td>
-                <td><strong class="text-success">Rp {{ number_format($item->total_harga, 0, ',', '.') }}</strong></td>
+                <td>{{ $item->kode_obat ?? '-' }}</td>
+                <td><strong>{{ $item->nama_obat ?? '-' }}</strong></td>
+                <td>{{ $item->satuan ?? '-' }}</td>
+                <td>{{ $item->stok ?? 0 }}</td>
+                <td>Rp {{ number_format($item->harga ?? 0, 0, ',', '.') }}</td>
                 <td>
-                  @if($item->status == 'selesai')
-                    <span class="badge bg-success">Selesai</span>
-                  @elseif($item->status == 'pending')
-                    <span class="badge bg-warning text-dark">Pending</span>
+                  @if($item->status)
+                    <span class="badge bg-success">Aktif</span>
                   @else
-                    <span class="badge bg-secondary">{{ $item->status }}</span>
+                    <span class="badge bg-secondary">Nonaktif</span>
                   @endif
                 </td>
               </tr>
               @empty
               <tr>
-                <td colspan="9" class="text-center py-5">
-                  <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                  <p class="text-muted mb-0">Belum ada data pembelian obat</p>
+                <td colspan="7" class="text-center py-5">
+                  <p class="text-muted mb-0">Belum ada data obat</p>
                 </td>
               </tr>
               @endforelse

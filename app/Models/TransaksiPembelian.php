@@ -25,6 +25,17 @@ class TransaksiPembelian extends Model
         'verified_by',
         'verified_at',
         'catatan_staff',
+
+            // Midtrans 
+        'snap_token',
+        'payment_type',
+        'transaction_id',
+        'order_id',
+        'midtrans_response',
+        'tanggal_bayar',
+        'verified_by',
+        'verified_at',
+        'catatan_staff',
     ];
 
     protected $casts = [
@@ -55,4 +66,9 @@ class TransaksiPembelian extends Model
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
+
+    public function detailTransaksi()
+{
+    return $this->hasMany(DetailTransaksiPembelian::class, 'id_obat');
+}
 }

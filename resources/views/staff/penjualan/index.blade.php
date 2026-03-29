@@ -1,86 +1,115 @@
 @extends('layouts.app')
 
-@section('title', 'Penjualan Obat')
+@section('title', 'Data Penjualan Obat')
 
 @section('content')
-<div class="row">
-  <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
+<div class="container-fluid">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4 class="card-title mb-0">Data Penjualan Obat</h4>
-          <a href="{{ route('staff.penjualan.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> Tambah Penjualan
-          </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Data Penjualan Obat</h1>
+            <small class="text-muted">Otomatis tercatat dari transaksi user yang telah dibayar</small>
         </div>
-
-        <div class="table-responsive">
-          <table class="table table-hover align-middle">
-            <thead class="thead-light">
-              <tr>
-                <th>No</th>
-                <th>Kode Transaksi</th>
-                <th>Obat</th>
-                <th>Jumlah</th>
-                <th>Tanggal Keluar</th>
-                <th>Deskripsi</th>
-                <th class="text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($penjualan as $key => $item)
-              <tr>
-                <td>{{ $penjualan->firstItem() + $key }}</td>
-
-                <td>
-                  <span class="badge badge-primary">{{ $item->kode }}</span>
-                </td>
-
-                <td>
-                  <strong>{{ $item->obat->nama_obat }}</strong><br>
-                  <small class="text-muted">Kode: {{ $item->obat->kode_obat }}</small>
-                </td>
-
-                <td>
-                  <span class="badge badge-danger px-3 py-2">
-                    {{ $item->jumlah }}
-                  </span>
-                </td>
-
-                <td>
-                  {{ \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') }}
-                </td>
-
-                <td>
-                  {{ Str::limit($item->deskripsi ?? '-', 40) }}
-                </td>
-
-                <td class="text-center">
-                  <a href="{{ route('staff.penjualan.show', $item->id) }}"
-                     class="btn btn-outline-info btn-sm" title="Detail">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                </td>
-              </tr>
-              @empty
-              <tr>
-                <td colspan="7" class="text-center py-4">
-                  <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
-                  <p class="text-muted mb-0">Belum ada data penjualan</p>
-                </td>
-              </tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-3">
-          {{ $penjualan->links() }}
-        </div>
-
-      </div>
     </div>
-  </div>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0 align-middle" id="dataTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:5%">No</th>
+                            <th>Kode Transaksi</th>
+                            <th>Nama Obat</th>
+                            <th class="text-center">Jumlah</th>
+                            <th>Tanggal Keluar</th>
+                            <th>Deskripsi</th>
+                            <th class="text-center" style="width:12%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($penjualan as $item)
+                        <tr>
+                            <td>{{ $penjualan->firstItem() + $loop->index }}</td>
+                            <td><span class="badge bg-primary">{{ $item->kode }}</span></td>
+                            <td>{{ $item->obat->nama_obat ?? '-' }}</td>
+                            <td class="text-center">{{ $item->jumlah }} {{ $item->obat->satuan ?? '' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') }}</td>
+                            <td>{{ $item->deskripsi ?? '-' }}</td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a href="{{ route('staff.penjualan.show', $item->id) }}"
+                                       class="btn btn-sm btn-info" title="Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('staff.penjualan.edit', $item->id) }}"
+                                       class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('staff.penjualan.destroy', $item->id) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Yakin hapus? Stok obat akan dikembalikan.')"
+                                          class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                    Belum ada data penjualan
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        {{ $penjualan->links() }}
+    </div>
+
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable({
+            paging: false,
+            searching: true,
+            ordering: true,
+            info: false,
+            responsive: true,
+            language: {
+                search: "Cari:",
+                zeroRecords: "Data tidak ditemukan",
+                emptyTable: "Tidak ada data"
+            }
+        });
+    });
+</script>
+@endpush

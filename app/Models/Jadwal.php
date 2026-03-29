@@ -57,4 +57,6 @@ class Jadwal extends Model
     {
         return $this->belongsTo(Dokter::class);
     }
+
+    
 }

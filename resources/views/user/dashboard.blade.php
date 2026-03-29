@@ -1,165 +1,131 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    .dash-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.07);
+        transition: transform .2s, box-shadow .2s;
+    }
+    .dash-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    }
+    .avatar {
+        width: 90px; height: 90px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #e9ecef;
+    }
+    .info-row {
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .info-row:last-child { border-bottom: none; }
+</style>
+@endpush
+
 @section('content')
 
-{{-- Greeting --}}
-<div class="row mb-4">
-    <div class="col-12 col-xl-8">
-        <h3 class="font-weight-bold">
-            Selamat Datang, {{ $profile->nama_panjang ?? Auth::user()->name }}!
-        </h3>
-        <h6 class="font-weight-normal mb-0">
-            <span class="text-primary">HealTack</span> - Sistem Informasi Kesehatan Anda
-        </h6>
-    </div>
+{{-- Header --}}
+<div class="mb-4">
+    <h3 class="font-weight-bold mb-1">
+        Selamat Datang, {{ $profile->nama_panjang ?? Auth::user()->name }}!
+    </h3>
+    <p class="text-muted mb-0"><span class="text-primary font-weight-bold">HealTack</span> — Sistem Informasi Kesehatan Anda</p>
 </div>
 
 {{-- Alert --}}
 @if(session('success'))
-<div class="row">
-    <div class="col-md-12">
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="icon-check"></i> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show mb-4">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
     </div>
-</div>
 @endif
 
-<div class="row">
+{{-- Top Row: Profile + Info --}}
+<div class="row mb-4">
 
-    {{-- Profile Card --}}
-    <div class="col-md-4 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-body text-center">
-
-                <img
-                    src="{{ $profile && $profile->foto
-                        ? asset('storage/'.$profile->foto)
-                        : asset('assets/images/faces/face1.jpg') }}"
-                    class="rounded-circle mb-3"
-                    style="width:100px;height:100px;object-fit:cover;">
+    {{-- Profile --}}
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="card dash-card h-100">
+            <div class="card-body text-center py-4">
+                <img src="{{ $profile && $profile->foto ? asset('storage/'.$profile->foto) : asset('assets/images/faces/face1.jpg') }}"
+                     class="avatar mb-3">
 
                 <h5 class="mb-1">{{ $profile->nama_panjang ?? '-' }}</h5>
-                <small class="text-muted">{{ Auth::user()->email }}</small>
+                <small class="text-muted d-block mb-2">{{ Auth::user()->email }}</small>
 
-                <div class="my-2">
-                    <span class="badge badge-{{ ($profile->jenis_kelamin ?? '') == 'L' ? 'info' : 'warning' }}">
-                        {{ ($profile->jenis_kelamin ?? '') == 'L' ? 'Laki-laki' : 'Perempuan' }}
-                    </span>
-                </div>
+                <span class="badge badge-{{ ($profile->jenis_kelamin ?? '') == 'L' ? 'info' : 'warning' }} mb-2">
+                    {{ ($profile->jenis_kelamin ?? '') == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                </span>
 
-                <small class="text-muted">
-                    <i class="icon-calendar"></i>
-                  {{ $profile->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->age.' tahun' : '-' }}
-                </small>
+                @if($profile->tanggal_lahir)
+                    <p class="text-muted small mb-3">
+                        {{ \Carbon\Carbon::parse($profile->tanggal_lahir)->age }} tahun
+                    </p>
+                @endif
 
-                <hr>
-
-                <a href="{{ route('user.profile.show') }}"
-                   class="btn btn-primary btn-sm btn-block">
-                    <i class="icon-user"></i> Lihat Profile Lengkap
+                <a href="{{ route('user.profile.show') }}" class="btn btn-primary btn-sm btn-block">
+                    Lihat Profile
                 </a>
             </div>
         </div>
     </div>
 
     {{-- Quick Info --}}
-    <div class="col-md-8 grid-margin stretch-card">
-        <div class="card">
+    <div class="col-md-8">
+        <div class="card dash-card h-100">
             <div class="card-body">
-                <h4 class="card-title">Informasi Cepat</h4>
+                <h5 class="card-title mb-3">Informasi Pribadi</h5>
 
-                <div class="row">
+                @php
+                $infos = [
+                    ['label' => 'Golongan Darah', 'value' => $profile->golongan_darah ?? '-'],
+                    ['label' => 'No. HP',         'value' => $profile->no_hp ?? '-'],
+                    ['label' => 'Alamat',         'value' => $profile->alamat ?? '-'],
+                ];
+                @endphp
 
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="icon-wrapper bg-primary text-white rounded-circle mr-3">
-                                <i class="icon-drop"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted">Golongan Darah</small>
-                                <h5 class="mb-0">{{ $profile->golongan_darah ?? '-' }}</h5>
-                            </div>
-                        </div>
+                @foreach($infos as $info)
+                    <div class="info-row">
+                        <small class="text-muted d-block">{{ $info['label'] }}</small>
+                        <strong>{{ $info['value'] }}</strong>
                     </div>
+                @endforeach
 
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="icon-wrapper bg-success text-white rounded-circle mr-3">
-                                <i class="icon-phone"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted">No. HP</small>
-                                <h6 class="mb-0">{{ $profile->no_hp ?? '-' }}</h6>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="d-flex align-items-start">
-                            <div class="icon-wrapper bg-info text-white rounded-circle mr-3">
-                                <i class="icon-location-pin"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted">Alamat</small>
-                                <p class="mb-0">{{ $profile->alamat ?? '-' }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
             </div>
         </div>
     </div>
 
 </div>
 
-{{-- Menu --}}
+{{-- Menu Cards --}}
+<h5 class="mb-3 font-weight-bold">Menu Utama</h5>
 <div class="row">
-@php
-$menus = [
-    ['icon'=>'icon-paper','color'=>'primary','title'=>'Konsultasi','desc'=>'Chat dengan dokter'],
-    ['icon'=>'fas fa-pills','color'=>'success','title'=>'Lihat Obat','desc'=>'Informasi obat'],
-    ['icon'=>'icon-calendar','color'=>'warning','title'=>'Jadwal Obat','desc'=>'Atur jadwal'],
-    ['icon'=>'icon-user','color'=>'info','title'=>'Profile','desc'=>'Kelola profile','url'=>route('user.profile.show')],
-];
-@endphp
 
-@foreach($menus as $menu)
-<div class="col-md-3 grid-margin stretch-card">
-    <div class="card card-menu-hover text-center">
-        <div class="card-body">
-            <i class="{{ $menu['icon'] }} text-{{ $menu['color'] }}" style="font-size:3rem"></i>
-            <h5 class="mt-3">{{ $menu['title'] }}</h5>
-            <p class="text-muted">{{ $menu['desc'] }}</p>
-            <a href="{{ $menu['url'] ?? '#' }}"
-               class="btn btn-{{ $menu['color'] }} btn-sm">Buka</a>
+    @php
+    $menus = [
+        ['color' => 'primary', 'title' => 'Konsultasi',  'desc' => 'Chat dengan dokter',  'url' => '#'],
+        ['color' => 'success', 'title' => 'Lihat Obat',  'desc' => 'Informasi obat',      'url' => '#'],
+        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Atur jadwal minum',   'url' => '#'],
+        ['color' => 'info',    'title' => 'Profile',     'desc' => 'Kelola data diri',    'url' => route('user.profile.show')],
+    ];
+    @endphp
+
+    @foreach($menus as $menu)
+    <div class="col-6 col-md-3 mb-4">
+        <div class="card dash-card text-center">
+            <div class="card-body py-4">
+                <h6 class="font-weight-bold mb-1">{{ $menu['title'] }}</h6>
+                <p class="text-muted small mb-3">{{ $menu['desc'] }}</p>
+                <a href="{{ $menu['url'] }}" class="btn btn-outline-{{ $menu['color'] }} btn-sm">Buka</a>
+            </div>
         </div>
     </div>
-</div>
-@endforeach
-</div>
+    @endforeach
 
-@push('styles')
-<style>
-.card-menu-hover {
-    transition: .3s;
-}
-.card-menu-hover:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,.1);
-}
-.icon-wrapper {
-    width: 50px;
-    height: 50px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-</style>
-@endpush
+</div>
 
 @endsection

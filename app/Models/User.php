@@ -74,4 +74,26 @@ class User extends Authenticatable
     {
         return $this->status === 'aktif';
     }
+
+
+    // app/Models/User.php
+
+public static function generateKodePasien(): string
+{
+    // Ambil data user terakhir berdasarkan ID terbesar
+    $lastRecord = User::latest('id')->first();
+    
+    // Kalau belum ada data → ID = 0, kalau ada → ambil ID-nya
+    $lastId = $lastRecord ? $lastRecord->id : 0;
+    
+    // Ambil tahun sekarang, contoh hasilnya: 2025
+    $tahun = date('Y');
+    
+    // Gabungkan semua jadi kode pasien
+    // str_pad → memastikan angka selalu 4 digit (0001, 0012, 0123, dst)
+    // +1 supaya kode untuk pasien BERIKUTNYA, bukan yang terakhir
+    $kode = 'BTK-' . $tahun . '-' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
+    
+    return $kode;
+}
 }

@@ -19,6 +19,7 @@ return new class extends Migration
     $table->string('password');
     $table->enum('status', ['aktif','nonaktif'])->default('aktif');
     $table->enum('role', ['admin','dokter','user','staff']);
+     $table->string('kode_pasien')->unique()->nullable();
     $table->rememberToken();
     $table->timestamps();
 });

@@ -42,10 +42,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item nav-category">
-                    <span class="nav-link">Akun</span>
-                </li>
-
                 <!-- Logout -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('logout') }}"

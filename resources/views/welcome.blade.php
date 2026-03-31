@@ -788,7 +788,6 @@
             </div>
             <div class="col-lg-7 fi">
                 <div class="limit-box"><div class="limit-ic"><i class="bi bi-x-circle"></i></div><div><h5>Bukan Pengganti Diagnosis</h5><p>Keputusan medis tetap harus dilakukan dokter melalui pemeriksaan langsung.</p></div></div>
-                <div class="limit-box"><div class="limit-ic"><i class="bi bi-file-earmark-x"></i></div><div><h5>Tidak Mengeluarkan Resep</h5><p>Sistem tidak memiliki wewenang untuk memberikan resep obat secara resmi.</p></div></div>
                 <div class="limit-box"><div class="limit-ic"><i class="bi bi-exclamation-triangle"></i></div><div><h5>Tidak Untuk Kondisi Darurat</h5><p>Segera kunjungi fasilitas kesehatan terdekat jika mengalami kondisi darurat.</p></div></div>
                 <div class="limit-box"><div class="limit-ic"><i class="bi bi-wifi-off"></i></div><div><h5>Bergantung pada Internet</h5><p>Layanan membutuhkan koneksi internet untuk dapat digunakan secara optimal.</p></div></div>
             </div>

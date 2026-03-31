@@ -21,8 +21,16 @@ Route::get('/', function () {
 });
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\OtpController;
+
+// Google OAuth
 Route::get('/auth/google',          [GoogleAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+
+// OTP
+Route::get ('/otp/verify', [OtpController::class, 'showVerify'])->name('otp.verify');
+Route::post('/otp/verify', [OtpController::class, 'verify']);
+Route::post('/otp/resend', [OtpController::class, 'resend'])->name('otp.resend');
 
 Auth::routes();
 

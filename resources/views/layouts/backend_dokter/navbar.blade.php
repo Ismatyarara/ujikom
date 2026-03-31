@@ -1,5 +1,5 @@
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-  
+
   {{-- Logo --}}
   <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
     <a class="navbar-brand brand-logo mr-5" href="{{ route('dokter.dashboard') }}">
@@ -19,133 +19,88 @@
 
     <ul class="navbar-nav navbar-nav-right">
 
-      {{-- 🔔 Notifikasi Pesan Chatify --}}
-      @php
-        $unread = \App\Models\ChMessage::where('to_id', auth()->id())
-                    ->where('seen', 0)
-                    ->count();
-      @endphp
+      {{-- Notifikasi Pesan --}}
+      @auth
+        @php
+          $unread = \App\Models\ChMessage::where('to_id', auth()->id())
+                      ->where('seen', 0)
+                      ->count();
 
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle"
-           href="#"
-           data-toggle="dropdown">
+          $recentMessages = \App\Models\ChMessage::where('to_id', auth()->id())
+                              ->where('seen', 0)
+                              ->with('sender')
+                              ->latest()
+                              ->take(3)
+                              ->get();
+        @endphp
 
-          <i class="icon-bell mx-0"></i>
+        <li class="nav-item dropdown">
+          <a class="nav-link count-indicator dropdown-toggle" href="#" data-toggle="dropdown">
+            <i class="icon-bell mx-0"></i>
+            @if($unread > 0)
+              <span class="count bg-danger text-white">{{ $unread }}</span>
+            @endif
+          </a>
 
-          @if($unread > 0)
-            <span class="count bg-danger text-white">
-              {{ $unread }}
-            </span>
-          @endif
-        </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list">
+            <p class="dropdown-header">Pesan Baru</p>
 
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list">
-          <p class="dropdown-header">Pesan Baru</p>
+            @forelse($recentMessages as $msg)
+              <a class="dropdown-item preview-item" href="{{ url('chatify/' . $msg->from_id) }}">
+                <div class="preview-thumbnail">
+                  <img src="{{ $msg->sender?->avatar ?? asset('assets/images/faces/face1.jpg') }}"
+                       class="rounded-circle" width="40" height="40">
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject">{{ $msg->sender?->name ?? 'Unknown' }}</h6>
+                  <p class="small text-muted mb-0">{{ \Illuminate\Support\Str::limit($msg->body, 35) }}</p>
+                </div>
+              </a>
+            @empty
+              <div class="dropdown-item text-center text-muted">Tidak ada pesan baru</div>
+            @endforelse
 
-          @php
-            $recentMessages = \App\Models\ChMessage::where('to_id', auth()->id())
-                                ->where('seen', 0)
-                                ->with('sender')
-                                ->latest()
-                                ->take(3)
-                                ->get();
-          @endphp
-
-          @forelse($recentMessages as $msg)
-            <a class="dropdown-item preview-item"
-               href="{{ url('chatify/' . $msg->from_id) }}">
-
-              <div class="preview-thumbnail">
-                <img src="{{ $msg->sender->avatar ?? asset('assets/images/faces/face1.jpg') }}"
-                     class="rounded-circle"
-                     width="40"
-                     height="40">
-              </div>
-
-              <div class="preview-item-content">
-                <h6 class="preview-subject">
-                  {{ $msg->sender->name }}
-                </h6>
-                <p class="small text-muted mb-0">
-                  {{ \Illuminate\Support\Str::limit($msg->body, 35) }}
-                </p>
-              </div>
-            </a>
-          @empty
-            <div class="dropdown-item text-center text-muted">
-              Tidak ada pesan baru
-            </div>
-          @endforelse
-
-          @if($unread > 0)
-            <a class="dropdown-item text-center"
-               href="{{ url('chatify') }}">
-              Lihat Semua Pesan
-            </a>
-          @endif
-        </div>
-      </li>
-
-      {{-- 👨‍⚕️ Profile Dokter --}}
-      <li class="nav-item nav-profile dropdown">
-        <a class="nav-link dropdown-toggle"
-           href="#"
-           data-toggle="dropdown">
-
-          <img src="{{ auth()->user()->avatar ?? asset('assets/images/faces/face28.jpg') }}"
-               alt="profile"/>
-        </a>
-
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown">
-
-          <div class="dropdown-header text-center">
-            <p class="mb-1 mt-3 font-weight-semibold">
-              {{ auth()->user()->name }}
-            </p>
-            <p class="text-muted mb-0">
-              {{ auth()->user()->email }}
-            </p>
-            <p class="text-primary mb-0">
-              <small>Dokter</small>
-            </p>
+            @if($unread > 0)
+              <a class="dropdown-item text-center" href="{{ url('chatify') }}">Lihat Semua Pesan</a>
+            @endif
           </div>
+        </li>
+      @endauth
 
-          <a class="dropdown-item" href="{{ url('chatify') }}">
-            <i class="ti-comment text-primary"></i>
-            Pesan Konsultasi
+      {{-- Profile Dokter --}}
+      @auth
+        <li class="nav-item nav-profile dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+            <img src="{{ auth()->user()->avatar ?? asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
           </a>
 
-          {{-- Kalau nanti ada profil dokter --}}
-          {{-- 
-          <a class="dropdown-item" href="{{ route('dokter.profile.show') }}">
-            <i class="ti-user text-primary"></i>
-            Profil Saya
-          </a>
-          --}}
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown">
+            <div class="dropdown-header text-center">
+              <p class="mb-1 mt-3 font-weight-semibold">{{ auth()->user()->name }}</p>
+              <p class="text-muted mb-0">{{ auth()->user()->email }}</p>
+              <p class="text-primary mb-0"><small>Dokter</small></p>
+            </div>
 
-          <a class="dropdown-item"
-             href="{{ route('logout') }}"
-             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="ti-power-off text-danger"></i>
-            Logout
-          </a>
+            <a class="dropdown-item" href="{{ url('chatify') }}">
+              <i class="ti-comment text-primary"></i> Pesan Konsultasi
+            </a>
 
-          <form id="logout-form"
-                action="{{ route('logout') }}"
-                method="POST"
-                class="d-none">
-            @csrf
-          </form>
+            <a class="dropdown-item" href="{{ route('logout') }}"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class="ti-power-off text-danger"></i> Logout
+            </a>
 
-        </div>
-      </li>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
+          </div>
+        </li>
+      @endauth
 
     </ul>
 
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center"
-            type="button"
-            data-toggle="offcanvas">
+            type="button" data-toggle="offcanvas">
       <span class="icon-menu"></span>
     </button>
 

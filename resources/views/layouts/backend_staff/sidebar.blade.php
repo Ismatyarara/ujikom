@@ -18,14 +18,6 @@
             </a>
         </li>
 
-        <!-- Data Pembelian Obat -->
-        <li class="nav-item {{ request()->routeIs('staff.pembelian.*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('staff.pembelian.index') }}">
-                <i class="fas fa-shopping-cart menu-icon"></i>
-                <span class="menu-title">Pembelian Obat</span>
-            </a>
-        </li>
-
         <!-- Barang Masuk -->
         <li class="nav-item {{ request()->routeIs('staff.barang-masuk.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.barang-masuk.index') }}">

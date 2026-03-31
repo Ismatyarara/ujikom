@@ -3,61 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\InvalidStateException;
 
 class GoogleAuthController extends Controller
 {
     public function redirect()
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        return Socialite::driver('google')->redirect();
     }
 
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
-        } catch (InvalidStateException $e) {
-            return redirect('/login')->with('error', 'Login Google gagal, silakan coba lagi.');
+            $googleUser = Socialite::driver('google')->user();
+        } catch (\Exception $e) {
+            return redirect()->route('login')->with('error', 'Login Google gagal. Coba lagi.');
         }
 
+        // Cari atau buat user — role selalu 'user' untuk login Google
         $user = User::updateOrCreate(
-            ['email' => $googleUser->email],
+            ['email' => $googleUser->getEmail()],
             [
-                'name'      => $googleUser->name,
-                'google_id' => $googleUser->id,
-                'password'  => bcrypt(str()->random(16)),
-                'role'      => 'user', // default role untuk Google login
+                'name'              => $googleUser->getName(),
+                'google_id'         => $googleUser->getId(),
+                'avatar'            => $googleUser->getAvatar(),
+                'email_verified_at' => now(),
+                'password'          => bcrypt(Str::random(24)),
+                'role'              => 'user',
             ]
         );
 
-        Auth::login($user);
+        // Simpan session & kirim OTP
+        session([
+            'otp_email'  => $user->email,
+            'otp_source' => 'google',
+        ]);
+        OtpController::sendOtp($user->email);
 
-        return $this->redirectByRole($user);
-    }
-
-    protected function redirectByRole($user)
-    {
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-
-            case 'dokter':
-                return redirect()->route('dokter.dashboard');
-
-            case 'staff':
-                return redirect()->route('staff.dashboard');
-
-            case 'user':
-                if (!$user->profile) {
-                    return redirect()->route('user.profile.create')
-                        ->with('warning', 'Silakan lengkapi profile Anda terlebih dahulu.');
-                }
-                return redirect()->route('user.dashboard');
-
-            default:
-                return redirect('/home');
-        }
+        return redirect()->route('otp.verify');
     }
 }

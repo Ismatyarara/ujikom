@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OtpController;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -13,78 +14,53 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/user/profile/create'; // Redirect ke create profile
+    protected $redirectTo = '/user/profile/create';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest');
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
-     */
     protected function create(array $data)
     {
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name'     => $data['name'],
+            'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'user', // Default role
+            'role'     => 'user',
         ]);
     }
 
     /**
-     * The user has been registered.
-     * Override method ini untuk custom redirect dengan flash message
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return mixed
+     * Override register() dari trait.
+     * Buat user dulu → kirim OTP → redirect ke halaman OTP verify.
      */
-    protected function registered(Request $request, $user)
+    public function register(Request $request)
     {
-        return redirect()->route('user.profile.create')
-            ->with('success', 'Registrasi berhasil! Silakan lengkapi profile Anda terlebih dahulu.');
+        $this->validator($request->all())->validate();
+
+        // Buat user langsung (belum login)
+        $user = $this->create($request->all());
+        event(new Registered($user));
+
+        // Simpan session & kirim OTP via Cache (konsisten dengan OtpController)
+        session([
+            'otp_email'  => $user->email,
+            'otp_source' => 'register',
+        ]);
+        OtpController::sendOtp($user->email);
+
+        return redirect()->route('otp.verify');
     }
 }

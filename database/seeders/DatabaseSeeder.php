@@ -74,22 +74,24 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Seed Regular Users
-        User::create([
-            'name' => 'User Test',
-            'email' => 'user@healtack.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
-            'email_verified_at' => now(),
-        ]);
+       // Seed Regular Users
+User::create([
+    'kode_pasien' => User::generateKodePasien(), // ← tambah ini
+    'name' => 'User Test',
+    'email' => 'user@healtack.com',
+    'password' => Hash::make('password'),
+    'role' => 'user',
+    'email_verified_at' => now(),
+]);
 
-        User::create([
-            'name' => 'User Test 2',
-            'email' => 'user2@healtack.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
-            'email_verified_at' => now(),
-        ]);
+User::create([
+    'kode_pasien' => User::generateKodePasien(), // ← tambah ini
+    'name' => 'User Test 2',
+    'email' => 'user2@healtack.com',
+    'password' => Hash::make('password'),
+    'role' => 'user',
+    'email_verified_at' => now(),
+]);
 
         // Seed Obat
         $obatList = [

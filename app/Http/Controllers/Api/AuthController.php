@@ -1,87 +1,165 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash; // Sudah diperbaiki (I kapital)
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use App\Http\Controllers\OtpController;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-
-
+    /**
+     * Get all users for dashboard
+     */
     public function index()
     {
-        $users = User::all();
+        $users = User::latest()->get();
         return response()->json([
             'success' => true,
             'data'    => $users,
         ]);
-
-        
     }
+
+    /**
+     * Register Process
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name'     => 'required|string|max:255',
-            'email'    => 'required|string|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
-            // Gunakan 422 untuk error validasi input
-            return response()->json($validator->errors(), 422); 
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
+            'role'     => 'user',
+            'status'   => 'aktif',
+            'kode_pasien' => User::generateKodePasien(),
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        OtpController::sendOtp($user->email);
 
         return response()->json([
             'success' => true,
-            'data'    => $user,
-            'access_token' => $token, // Tambahkan token saat register agar user langsung login
-            'message' => 'Register Success',
+            'message' => 'Registrasi berhasil. Kode OTP telah dikirim ke email.',
+            'requires_otp' => true,
+            'email' => $user->email,
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
         ], 201);
     }
 
+    /**
+     * Login Process
+     */
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $credentials = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid login details'
+                'message' => 'Email atau password salah',
             ], 401);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user  = User::where('email', $request->email)->firstOrFail();
+
+        if (! $user->hasVerifiedEmail()) {
+            OtpController::sendOtp($user->email);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Email belum diverifikasi. Kode OTP baru telah dikirim.',
+                'requires_otp' => true,
+                'email' => $user->email,
+            ], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
-            'message' => 'Login Success',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
+            'message' => 'Login Berhasil',
+            'token'   => $token,
+            'data'    => $user,
         ]);
     }
 
+    public function verifyOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $cacheKey = 'otp_' . $request->email;
+        $storedOtp = Cache::get($cacheKey);
+
+        if (! $storedOtp || (string) $storedOtp !== (string) $request->otp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode OTP salah atau sudah kadaluarsa.',
+            ], 422);
+        }
+
+        Cache::forget($cacheKey);
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Verifikasi OTP berhasil.',
+            'token' => $token,
+            'data' => $user,
+        ]);
+    }
+
+    /**
+     * Logout Process
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout Success',
+            'message' => 'Logout berhasil',
         ]);
     }
-
-
-
-    // ... fungsi login & logout sudah oke
 }

@@ -13,20 +13,14 @@
                         @csrf
                         @method('PUT')
 
-                        <!-- Pilih Pasien -->
+                        <!-- Data Pasien -->
                         <div class="mb-3">
-                            <label class="form-label">Pasien <span class="text-danger">*</span></label>   
-                            <select name="user_id" class="form-control @error('user_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Pasien --</option>
-                                @foreach($pasien as $p)
-                                    <option value="{{ $p->id }}" {{ old('user_id', $catatan->user_id) == $p->id ? 'selected' : '' }}>
-                                        {{ $p->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('user_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <label class="form-label">Pasien</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ $catatan->user->name }}{{ $catatan->user->kode_pasien ? ' - ' . $catatan->user->kode_pasien : '' }}"
+                                   disabled>
+                            <small class="text-muted">Pasien pada catatan medis yang sudah dibuat tidak bisa diubah.</small>
                         </div>
 
                         <!-- Keluhan -->

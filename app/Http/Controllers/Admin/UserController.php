@@ -23,25 +23,25 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
-            'status' => 'required|in:aktif,nonaktif',
+            'status'   => 'required|in:aktif,nonaktif',
         ]);
 
         User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'user',
-            'status' => $validated['status'],
+            'kode_pasien'       => User::generateKodePasien(),
+            'name'              => $validated['name'],
+            'email'             => $validated['email'],
+            'password'          => Hash::make($validated['password']),
+            'role'              => 'user',
+            'status'            => $validated['status'],
             'email_verified_at' => now(),
         ]);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil ditambahkan');
     }
-
 
     public function edit(User $user)
     {
@@ -51,15 +51,15 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:8|confirmed',
-            'status' => 'required|in:aktif,nonaktif',
+            'status'   => 'required|in:aktif,nonaktif',
         ]);
 
         $userData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
+            'name'   => $validated['name'],
+            'email'  => $validated['email'],
             'status' => $validated['status'],
         ];
 

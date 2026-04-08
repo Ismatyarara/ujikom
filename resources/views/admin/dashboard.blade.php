@@ -3,16 +3,36 @@
 @section('title', 'Dashboard')
 
 @section('content')
+<style>
+  .admin-hero {
+    margin-bottom: 22px;
+  }
+  .admin-hero-title {
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 6px;
+  }
+  .stat-card {
+    border: 1px solid #edf1f7;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  }
+  .quick-card {
+    border: 1px solid #edf1f7;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  }
+</style>
 <div class="row">
-  <div class="col-12 mb-4">
-    <h3 class="font-weight-bold">Selamat Datang, {{ auth()->user()->name }}!</h3>
+  <div class="col-12 admin-hero">
+    <h3 class="admin-hero-title">Selamat Datang, {{ auth()->user()->name }}!</h3>
     <p class="text-muted">Berikut adalah ringkasan sistem HealTack Anda</p>
   </div>
 </div>
 
 <div class="row">
   <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between">
           <div>
@@ -31,7 +51,7 @@
   </div>
 
   <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between">
           <div>
@@ -50,7 +70,7 @@
   </div>
 
   <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between">
           <div>
@@ -69,7 +89,7 @@
   </div>
 
   <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between">
           <div>
@@ -90,7 +110,7 @@
 
 <div class="row">
   <div class="col-lg-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
         <h4 class="card-title">Stok Obat</h4>
         <div class="d-flex align-items-center">
@@ -107,7 +127,7 @@
   </div>
 
   <div class="col-lg-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
         <h4 class="card-title">Obat Menipis</h4>
         <div class="d-flex align-items-center">
@@ -129,16 +149,16 @@
   </div>
 
   <div class="col-lg-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card stat-card">
       <div class="card-body">
-        <h4 class="card-title">Sistem</h4>
+        <h4 class="card-title">Hari Ini</h4>
         <div class="d-flex align-items-center">
           <div class="mr-3">
-            <i class="fas fa-cog fa-3x text-info"></i>
+            <i class="fas fa-calendar-day fa-3x text-info"></i>
           </div>
           <div>
-            <h5 class="mb-1 font-weight-bold">HealTack v1.0</h5>
-            <p class="text-muted mb-0">Sistem Manajemen Klinik</p>
+            <h5 class="mb-1 font-weight-bold">{{ now()->isoFormat('dddd') }}</h5>
+            <p class="text-muted mb-0">{{ now()->isoFormat('D MMMM YYYY') }}</p>
           </div>
         </div>
       </div>
@@ -148,8 +168,8 @@
 
 
 <div class="row">
-  <div class="col-lg-6 grid-margin stretch-card">
-    <div class="card">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card quick-card">
       <div class="card-body">
         <h4 class="card-title mb-4">Quick Actions</h4>
         <div class="row">
@@ -165,7 +185,7 @@
           </div>
           <div class="col-6 mb-3">
             <a href="{{ route('admin.obat.pembelian') }}" class="btn btn-outline-warning btn-block">
-              <i class="fas fa-pills"></i> lihat pembelian
+              <i class="fas fa-pills"></i> Lihat Pembelian
             </a>
           </div>
           <div class="col-6 mb-3">
@@ -173,25 +193,6 @@
               <i class="fas fa-stethoscope"></i> Tambah Spesialisasi
             </a>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-lg-6 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title mb-4">Informasi</h4>
-        <div class="alert alert-info">
-          <i class="fas fa-info-circle"></i> 
-          <strong>Selamat Datang di HealTack!</strong>
-          <p class="mb-0 mt-2">Sistem manajemen klinik terintegrasi untuk mengelola data dokter, staff, obat, dan konsultasi pasien.</p>
-        </div>
-        <div class="mt-3">
-          <small class="text-muted">
-            <i class="fas fa-calendar"></i> {{ now()->isoFormat('dddd, D MMMM YYYY') }}<br>
-            <i class="fas fa-clock"></i> {{ now()->format('H:i') }} WIB
-          </small>
         </div>
       </div>
     </div>

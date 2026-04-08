@@ -5,6 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $nama_obat
+ * @property int|float $harga
+ * @property int $stok
+ * @property string|null $satuan
+ */
+
 class Obat extends Model
 {
     use HasFactory;

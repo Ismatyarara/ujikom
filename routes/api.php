@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AdminAnalisisController;
+use App\Http\Controllers\Api\MobilePreviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +15,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin', function () {
         'message' => 'Halo Admin'
     ]);
 });
+
+Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin/analisis', [AdminAnalisisController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'role:dokter'])->get('/dokter', function () {
     return response()->json([
@@ -35,21 +39,18 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth:sanctum');
+Route::get('/mobile/home', [MobilePreviewController::class, 'home']);
 
 
+use App\Http\Controllers\Api\CatatanMedisApiController;
 
-use App\Http\Controllers\Api\JadwalApiController;
-use App\Http\Controllers\Api\KonsultasiApiController;
-
-Route::middleware(['auth:sanctum'])->group(function () {
-    // Jadwal Obat
-    Route::get('/jadwal',      [JadwalApiController::class, 'index']);
-    Route::get('/jadwal/{id}', [JadwalApiController::class, 'show']);
-
-    // Konsultasi
-    Route::get('/spesialisasi',                        [KonsultasiApiController::class, 'spesialisasi']);
-    Route::get('/spesialisasi/{id}/dokter',            [KonsultasiApiController::class, 'dokterBySpesialisasi']);
-    Route::get('/konsultasi/pesan/{dokterId}',         [KonsultasiApiController::class, 'riwayatChat']);
-    Route::post('/konsultasi/pesan',                   [KonsultasiApiController::class, 'kirimPesan']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('catatan', CatatanMedisApiController::class);
 });
 
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+use App\Http\Controllers\Api\JadwalApiController;
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/jadwal',      [JadwalApiController::class, 'index']);
+    Route::get('/jadwal/{id}', [JadwalApiController::class, 'show']);
+});

@@ -35,26 +35,21 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role'     => 'user',
+            'kode_pasien' => User::generateKodePasien(),
+            'name'        => $data['name'],
+            'email'       => $data['email'],
+            'password'    => Hash::make($data['password']),
+            'role'        => 'user',
         ]);
     }
 
-    /**
-     * Override register() dari trait.
-     * Buat user dulu → kirim OTP → redirect ke halaman OTP verify.
-     */
     public function register(Request $request)
     {
         $this->validator($request->all())->validate();
 
-        // Buat user langsung (belum login)
         $user = $this->create($request->all());
         event(new Registered($user));
 
-        // Simpan session & kirim OTP via Cache (konsisten dengan OtpController)
         session([
             'otp_email'  => $user->email,
             'otp_source' => 'register',

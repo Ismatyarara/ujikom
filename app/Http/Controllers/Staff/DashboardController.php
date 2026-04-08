@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\BarangMasuk;
 use App\Models\BarangKeluar;
 use App\Models\Obat;
+use App\Models\TransaksiPembelian;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -28,6 +29,10 @@ class DashboardController extends Controller
         $barangKeluarBulanIni = BarangKeluar::whereMonth('tanggal_keluar', date('m'))
             ->whereYear('tanggal_keluar', date('Y'))
             ->sum('jumlah');
+
+        $totalPesananUser = TransaksiPembelian::count();
+        $pesananPending = TransaksiPembelian::where('status', 'pending')->count();
+        $pesananDibayar = TransaksiPembelian::whereIn('status', ['dibayar', 'diverifikasi', 'selesai'])->count();
         
         // Obat terlaris (top 5)
         $obatTerlaris = BarangKeluar::select('id_obat', DB::raw('SUM(jumlah) as total_terjual'))
@@ -40,6 +45,11 @@ class DashboardController extends Controller
         // Transaksi terakhir (barang keluar)
         $transaksiTerakhir = BarangKeluar::with('obat')
             ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $pesananTerbaru = TransaksiPembelian::with('user')
+            ->latest()
             ->limit(5)
             ->get();
         
@@ -69,8 +79,12 @@ class DashboardController extends Controller
             'obatStokRendah',
             'barangMasukBulanIni',
             'barangKeluarBulanIni',
+            'totalPesananUser',
+            'pesananPending',
+            'pesananDibayar',
             'obatTerlaris',
             'transaksiTerakhir',
+            'pesananTerbaru',
             'chartData'
         ));
     }

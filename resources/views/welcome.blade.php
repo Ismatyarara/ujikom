@@ -646,7 +646,7 @@
     <div class="mobile-drawer">
         <div class="mobile-drawer-header">
             <a href="#hero" class="logo-wrap" onclick="closeMobileMenu()">
-                <div class="logo-icon" style="width:32px;height:32px;font-size:15px">🩺</div>
+                <div class="logo-icon" style="width:32px;height:32px;font-size:15px"><i class="bi bi-heart-pulse-fill"></i></div>
                 <div class="logo-text" style="font-size:18px">Heal<span>Tack</span></div>
             </a>
             <button class="mobile-close" id="mobileClose" aria-label="Tutup">
@@ -659,7 +659,6 @@
             <li><a href="#layanan" onclick="closeMobileMenu()"><i class="bi bi-grid"></i> Layanan</a></li>
             <li><a href="#keterbatasan" onclick="closeMobileMenu()"><i class="bi bi-shield-exclamation"></i> Keterbatasan</a></li>
             <li><a href="#langkah" onclick="closeMobileMenu()"><i class="bi bi-list-ol"></i> Panduan</a></li>
-            <li><a href="#testimoni" onclick="closeMobileMenu()"><i class="bi bi-chat-quote"></i> Testimoni</a></li>
             <li><a href="#faq" onclick="closeMobileMenu()"><i class="bi bi-question-circle"></i> FAQ</a></li>
         </ul>
         <div class="mobile-cta-group">
@@ -690,8 +689,7 @@
             </div>
             <div style="position:relative">
                 <div class="hero-card">
-                    <h4>📋 Fitur Utama HealTack</h4>
-                    <div class="feature-row"><i class="bi bi-file-medical" style="color:#60A5FA"></i> Catatan Medis Digital</div>
+                    <h4><i class="bi bi-clipboard2-pulse" style="color:#60A5FA; margin-right:8px;"></i>Fitur Utama HealTack</h4>
                     <div class="feature-row"><i class="bi bi-bell" style="color:#FBBF24"></i> Notifikasi Minum Obat (Email)</div>
                     <div class="feature-row"><i class="bi bi-chat-dots" style="color:#34D399"></i> Konsultasi dengan Dokter</div>
                     <div class="feature-row"><i class="bi bi-capsule" style="color:#F87171"></i> Pembelian Obat Online</div>
@@ -715,9 +713,9 @@
 <div class="warn-banner">
     <div class="container">
         <div class="warn-inner">
-            <div class="warn-icon">⚠️</div>
+            <div class="warn-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div>
-                <h5>Perhatian Penting — HealTack Bukan Pengganti Dokter</h5>
+                <h5>Perhatian Penting - HealTack Bukan Pengganti Dokter</h5>
                 <p>HealTack adalah platform informasi kesehatan awal. Seluruh konten bersifat edukatif dan <strong>tidak dapat menggantikan diagnosis, pemeriksaan, maupun resep dari dokter berlisensi.</strong> Jika mengalami gejala serius, segera hubungi dokter atau kunjungi fasilitas kesehatan terdekat.</p>
             </div>
         </div>
@@ -905,16 +903,16 @@
 
         </div>
 
-        <div class="footer-bottom">
-            <p>© 2026 HealTack — Sistem Informasi Pelayanan Kesehatan</p>
+        <div class=\"footer-bottom\">
+            <p>&copy; 2026 HealTack - Sistem Informasi Pelayanan Kesehatan</p>
         </div>
     </div>
 </footer>
 
 <!-- Scroll Top -->
-<a href="#hero" class="scroll-top"><i class="bi bi-arrow-up-short"></i></a>
+<a href=\"#hero\" class=\"scroll-top\"><i class=\"bi bi-arrow-up-short\"></i></a>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\"></script>
 <script>
     /* FAQ */
     function toggleFaq(el){el.closest('.faq-item').classList.toggle('open')}
@@ -950,8 +948,12 @@
         })(t0);
     }
     let fired=false;
-    new IntersectionObserver(e=>{if(e[0].isIntersecting&&!fired){fired=true;document.querySelectorAll('.counter-val').forEach(animateCounter)}},{threshold:.3})
-    .observe(document.getElementById('statsSection'));
+    const statsSection=document.getElementById('statsSection');
+    if(statsSection){
+        new IntersectionObserver(e=>{if(e[0].isIntersecting&&!fired){fired=true;document.querySelectorAll('.counter-val').forEach(animateCounter)}},{threshold:.3})
+        .observe(statsSection);
+    }
 </script>
 </body>
 </html>
+

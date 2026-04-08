@@ -9,13 +9,24 @@ use Illuminate\Http\Request;
 class DataObatController extends Controller
 {
     // ================= INDEX =================
-    public function index()
+    public function index(Request $request)
     {
-        $obat = Obat::where('status', 1)
-            ->orderBy('nama_obat')
-            ->get();
+        $search = trim((string) $request->query('search'));
 
-        return view('dokter.data-obat.index', compact('obat'));
+        $obat = Obat::where('status', 1)
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('nama_obat', 'like', "%{$search}%")
+                        ->orWhere('kode_obat', 'like', "%{$search}%")
+                        ->orWhere('aturan_pakai', 'like', "%{$search}%")
+                        ->orWhere('efek_samping', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('nama_obat')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('dokter.data-obat.index', compact('obat', 'search'));
     }
 
     // ================= SHOW =================

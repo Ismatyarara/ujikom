@@ -28,6 +28,7 @@
             <thead>
               <tr>
                 <th>No</th>
+                <th>Kode Pasien</th> {{-- ← tambah ini --}}
                 <th>Nama</th>
                 <th>Email</th>
                 <th>Status</th>
@@ -39,6 +40,11 @@
               @forelse($users as $key => $item)
               <tr>
                 <td>{{ $users->firstItem() + $key }}</td>
+                <td>
+                  <span class="badge badge-info">
+                    {{ $item->kode_pasien ?? '-' }} {{-- ← tambah ini --}}
+                  </span>
+                </td>
                 <td>
                   <strong>{{ $item->name }}</strong>
                 </td>
@@ -67,7 +73,7 @@
               </tr>
               @empty
               <tr>
-                <td colspan="6" class="text-center py-4">
+                <td colspan="7" class="text-center py-4"> {{-- colspan 6 → 7 --}}
                   <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                   <p class="text-muted">Belum ada data user</p>
                 </td>

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Lengkapi Profile')
+@section('title', 'Lengkapi Profil')
 
 @section('content')
 <div class="content-wrapper">
@@ -8,15 +8,16 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="card-title mb-0">Lengkapi Profile Anda</h4>
-                        <a href="{{ route('user.dashboard') }}" class="btn btn-sm btn-secondary">
-                            <i class="icon-arrow-left"></i> Kembali
-                        </a>
+                        <div>
+                            <h4 class="card-title mb-1">Lengkapi Profil Anda</h4>
+                            <p class="text-muted mb-0">Data ini dipakai untuk mengaktifkan fitur kesehatan Anda.</p>
+                        </div>
+                        <span class="badge badge-primary">Langkah wajib</span>
                     </div>
 
                     <div class="alert alert-info">
                         <i class="icon-info mr-2"></i>
-                        Lengkapi profile Anda untuk dapat mengakses semua fitur aplikasi.
+                        Lengkapi profil Anda untuk dapat mengakses semua fitur aplikasi.
                     </div>
 
                     <form action="{{ route('user.profile.store') }}" method="POST" enctype="multipart/form-data" class="forms-sample">
@@ -139,10 +140,10 @@
                             </div>
                         </div>
 
-                        <!-- Foto Profile -->
+                        <!-- Foto Profil -->
                         <div class="form-group row">
                             <label for="foto" class="col-sm-3 col-form-label">
-                                Foto Profile
+                                Foto Profil
                             </label>
                             <div class="col-sm-9">
                                 <input type="file" 
@@ -164,7 +165,7 @@
                         <div class="form-group row">
                             <div class="col-sm-9 offset-sm-3">
                                 <button type="submit" class="btn btn-primary mr-2">
-                                    <i class="icon-check"></i> Simpan Profile
+                                    <i class="icon-check"></i> Simpan Profil
                                 </button>
                                 <button type="reset" class="btn btn-light">
                                     <i class="icon-refresh"></i> Reset

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Register — HealTack</title>
+  <title>Register - HealTack</title>
 
   <link rel="stylesheet" href="{{ asset('assets/vendors/feather/feather.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/vendors/ti-icons/css/themify-icons.css') }}">
@@ -44,21 +44,23 @@
     }
     @keyframes glow {
       0%,100% { transform: scale(1); opacity: 1; }
-      50%      { transform: scale(1.08); opacity: .6; }
+      50% { transform: scale(1.08); opacity: .6; }
     }
 
     .register-card {
       background: #fff;
       border-radius: 22px;
       padding: 44px 42px;
-      width: 100%; max-width: 480px;
-      position: relative; z-index: 2;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 2;
       box-shadow: 0 24px 64px rgba(0,0,0,.35);
       animation: slideUp .55s ease-out;
     }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(40px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .register-card::before {
       content: '';
@@ -71,10 +73,9 @@
     }
     @keyframes bar {
       from { background-position: 0% 0%; }
-      to   { background-position: 200% 0%; }
+      to { background-position: 200% 0%; }
     }
 
-    /* Step indicator */
     .step-indicator {
       display: flex; align-items: center; justify-content: center;
       gap: 0; margin-bottom: 28px;
@@ -86,8 +87,8 @@
       transition: all .3s;
       position: relative; z-index: 1;
     }
-    .step-dot.active   { background: #1A56DB; color: #fff; box-shadow: 0 0 0 4px rgba(26,86,219,.15); }
-    .step-dot.done     { background: #22C55E; color: #fff; }
+    .step-dot.active { background: #1A56DB; color: #fff; box-shadow: 0 0 0 4px rgba(26,86,219,.15); }
+    .step-dot.done { background: #22C55E; color: #fff; }
     .step-dot.inactive { background: #E2E8F0; color: #94A3B8; }
     .step-line {
       flex: 1; height: 2px; max-width: 60px;
@@ -111,9 +112,8 @@
     .logo-text span { color: #1A56DB; }
 
     .card-title { text-align: center; font-size: 21px; font-weight: 800; color: #0C1D3B; margin-bottom: 4px; }
-    .card-sub   { text-align: center; font-size: 13.5px; color: #64748B; margin-bottom: 26px; }
+    .card-sub { text-align: center; font-size: 13.5px; color: #64748B; margin-bottom: 26px; }
 
-    /* ── Panels ────────────────────────────────────────────────────────────────── */
     .panel { display: none; }
     .panel.active {
       display: block;
@@ -121,10 +121,9 @@
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Form Controls ──────────────────────────────────────────────────────────── */
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
     .input-wrap { position: relative; }
@@ -174,7 +173,6 @@
     }
     @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
 
-    /* ── OTP Panel ──────────────────────────────────────────────────────────────── */
     .shield-wrap { display: flex; justify-content: center; margin-bottom: 16px; }
     .shield-icon {
       width: 64px; height: 64px;
@@ -185,7 +183,7 @@
     }
     @keyframes pulse-shield {
       0%,100% { box-shadow: 0 0 0 0 rgba(26,86,219,.2); }
-      50%      { box-shadow: 0 0 0 12px rgba(26,86,219,0); }
+      50% { box-shadow: 0 0 0 12px rgba(26,86,219,0); }
     }
     .shield-icon svg { width: 32px; height: 32px; }
 
@@ -213,11 +211,11 @@
     .otp-box::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .otp-box:focus { border-color: #1A56DB; background: #EBF2FF; box-shadow: 0 0 0 4px rgba(26,86,219,.12); transform: translateY(-2px); }
     .otp-box.filled { border-color: #1A56DB; background: #EBF2FF; }
-    .otp-box.error  { border-color: #EF4444; background: #FEF2F2; animation: shake .35s ease; }
+    .otp-box.error { border-color: #EF4444; background: #FEF2F2; animation: shake .35s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20%      { transform: translateX(-5px); }
-      60%      { transform: translateX(5px); }
+      20% { transform: translateX(-5px); }
+      60% { transform: translateX(5px); }
     }
 
     .resend-wrap { text-align: center; margin-top: 16px; font-size: 13.5px; color: #64748B; }
@@ -231,14 +229,12 @@
     .resend-btn:not(:disabled):hover { text-decoration: underline; }
     .timer { font-weight: 700; color: #1A56DB; font-variant-numeric: tabular-nums; }
 
-    /* Divider */
     .divider {
       display: flex; align-items: center; gap: 12px;
       margin: 18px 0; color: #94A3B8; font-size: 12px; font-weight: 600;
     }
     .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
 
-    /* Google button */
     .btn-google {
       display: flex; align-items: center; justify-content: center; gap: 10px;
       width: 100%; padding: 13px 16px;
@@ -283,22 +279,16 @@
       <div class="logo-text">Heal<span>Tack</span></div>
     </a>
 
-    {{-- Step Indicator --}}
     <div class="step-indicator" id="stepIndicator">
       <div class="step-dot active" id="dot1">1</div>
-      <div class="step-line"      id="line1"></div>
+      <div class="step-line" id="line1"></div>
       <div class="step-dot inactive" id="dot2">2</div>
     </div>
 
-    {{-- Dynamic title area --}}
     <div class="card-title" id="cardTitle">Buat Akun Baru</div>
-    <div class="card-sub"   id="cardSub">Daftar hanya membutuhkan beberapa langkah</div>
+    <div class="card-sub" id="cardSub">Daftar lalu lanjutkan verifikasi email</div>
 
-    {{-- ════════════════════════════════════════════════════════
-         PANEL 1 — Form Data Diri
-    ════════════════════════════════════════════════════════ --}}
     <div class="panel active" id="panel1">
-
       @if ($errors->any())
         <div class="alert-error">{{ $errors->first() }}</div>
       @endif
@@ -343,7 +333,7 @@
               <i class="ti-lock input-icon"></i>
               <input type="password" id="password" name="password"
                 class="form-control @error('password') is-invalid @enderror"
-                placeholder="••••••••"
+                placeholder="Buat password"
                 required autocomplete="new-password">
             </div>
             @error('password')
@@ -357,7 +347,7 @@
               <i class="ti-lock input-icon"></i>
               <input type="password" id="password-confirm" name="password_confirmation"
                 class="form-control"
-                placeholder="••••••••"
+                placeholder="Ulangi password"
                 required autocomplete="new-password">
             </div>
           </div>
@@ -373,10 +363,8 @@
         <button type="submit" id="submitBtn" class="btn-submit">Daftar Sekarang</button>
       </form>
 
-      {{-- Divider --}}
       <div class="divider">atau daftar dengan</div>
 
-      {{-- Google Register --}}
       <a href="{{ route('auth.google') }}" class="btn-google">
         <svg width="20" height="20" viewBox="0 0 48 48">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -392,16 +380,9 @@
       <div class="card-footer-text">
         Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a>
       </div>
+    </div>
 
-    </div>{{-- /panel1 --}}
-
-    {{-- ════════════════════════════════════════════════════════
-         PANEL 2 — OTP Verification
-         Ditampilkan JS jika server merespons needs_otp=true
-         atau jika session('show_otp') = true setelah register
-    ════════════════════════════════════════════════════════ --}}
     <div class="panel" id="panel2">
-
       <div class="shield-wrap">
         <div class="shield-icon">
           <svg viewBox="0 0 24 24" fill="none">
@@ -443,14 +424,12 @@
           </button>
         </form>
       </div>
-
-    </div>{{-- /panel2 --}}
+    </div>
 
   </div>
 
   <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
   <script>
-    // ─── Show OTP panel if server says so (after register POST) ─────────────────
     const showOtp = @json(session('show_otp', false));
     const otpEmail = @json(session('otp_email', old('email', '')));
 
@@ -462,29 +441,23 @@
       document.getElementById('panel1').classList.remove('active');
       document.getElementById('panel2').classList.add('active');
 
-      // Step indicator
       document.getElementById('dot1').classList.remove('active');
       document.getElementById('dot1').classList.add('done');
-      document.getElementById('dot1').innerHTML = '✓';
+      document.getElementById('dot1').innerHTML = '?';
       document.getElementById('line1').classList.add('done');
       document.getElementById('dot2').classList.remove('inactive');
       document.getElementById('dot2').classList.add('active');
 
-      // Titles
       document.getElementById('cardTitle').textContent = 'Verifikasi Email';
-      document.getElementById('cardSub').textContent   = 'Kode 6 digit telah dikirim ke email kamu';
+      document.getElementById('cardSub').textContent = 'Kode 6 digit telah dikirim ke email kamu';
 
       if (email) document.getElementById('otpEmailBadge').textContent = email;
 
-      // Start countdown
       startCountdown();
-
-      // Focus first OTP box
       setTimeout(() => document.querySelector('#panel2 .otp-box').focus(), 100);
     }
 
-    // ─── OTP Box Behavior ───────────────────────────────────────────────────────
-    const boxes  = document.querySelectorAll('#panel2 .otp-box');
+    const boxes = document.querySelectorAll('#panel2 .otp-box');
     const hidden = document.getElementById('otpHidden');
 
     function updateHidden() {
@@ -520,7 +493,10 @@
         e.preventDefault();
         const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
         [...text].slice(0, 6).forEach((ch, idx) => {
-          if (boxes[idx]) { boxes[idx].value = ch; boxes[idx].classList.add('filled'); }
+          if (boxes[idx]) {
+            boxes[idx].value = ch;
+            boxes[idx].classList.add('filled');
+          }
         });
         updateHidden();
         const next = [...boxes].findIndex(b => !b.value);
@@ -538,15 +514,13 @@
       document.getElementById('otpSubmitBtn').disabled = true;
     });
 
-    // ─── Register form loading state ─────────────────────────────────────────────
     document.getElementById('registerForm').addEventListener('submit', function () {
       document.getElementById('submitBtn').disabled = true;
     });
 
-    // ─── Countdown ───────────────────────────────────────────────────────────────
     function startCountdown() {
       let secs = 60;
-      const timerEl   = document.getElementById('timerDisplay');
+      const timerEl = document.getElementById('timerDisplay');
       const resendBtn = document.getElementById('resendBtn');
       const iv = setInterval(() => {
         secs--;

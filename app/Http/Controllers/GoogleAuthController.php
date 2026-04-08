@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+ use Illuminate\Support\Facades\Auth;
 
 class GoogleAuthController extends Controller
 {
@@ -13,34 +14,38 @@ class GoogleAuthController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function callback()
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-        } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Login Google gagal. Coba lagi.');
-        }
+    // tambahin ini di atas
 
-        // Cari atau buat user — role selalu 'user' untuk login Google
-        $user = User::updateOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'name'              => $googleUser->getName(),
-                'google_id'         => $googleUser->getId(),
-                'avatar'            => $googleUser->getAvatar(),
-                'email_verified_at' => now(),
-                'password'          => bcrypt(Str::random(24)),
-                'role'              => 'user',
-            ]
-        );
-
-        // Simpan session & kirim OTP
-        session([
-            'otp_email'  => $user->email,
-            'otp_source' => 'google',
-        ]);
-        OtpController::sendOtp($user->email);
-
-        return redirect()->route('otp.verify');
+public function callback()
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
+    } catch (\Exception $e) {
+        return redirect()->route('login')->with('error', 'Login Google gagal. Coba lagi.');
     }
+
+    $user = User::updateOrCreate(
+        ['email' => $googleUser->getEmail()],
+        [
+            'name'              => $googleUser->getName(),
+            'google_id'         => $googleUser->getId(),
+            'avatar'            => $googleUser->getAvatar(),
+            'email_verified_at' => now(),
+            'password'          => bcrypt(Str::random(24)),
+            'role'              => 'user',
+        ]
+    );
+
+    // kalau user baru → generate kode pasien
+    if ($user->wasRecentlyCreated) {
+        $user->update([
+            'kode_pasien' => User::generateKodePasien(),
+        ]);
+    }
+
+    // ✅ LANGSUNG LOGIN (tanpa OTP)
+    Auth::login($user, true);
+
+    return redirect()->route('user.dashboard');
+}
 }

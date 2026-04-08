@@ -72,6 +72,56 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-md-4 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <p class="card-title text-md-left text-xl-left">Total Pesanan</p>
+            <h2 class="mb-0 text-primary">{{ $totalPesananUser }}</h2>
+          </div>
+          <div class="text-primary">
+            <i class="fas fa-receipt fa-3x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <p class="card-title text-md-left text-xl-left">Pesanan Pending</p>
+            <h2 class="mb-0 text-warning">{{ $pesananPending }}</h2>
+          </div>
+          <div class="text-warning">
+            <i class="fas fa-hourglass-half fa-3x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <p class="card-title text-md-left text-xl-left">Pesanan Dibayar</p>
+            <h2 class="mb-0 text-success">{{ $pesananDibayar }}</h2>
+          </div>
+          <div class="text-success">
+            <i class="fas fa-check-circle fa-3x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Chart & Top Products -->
 <div class="row">
   <!-- Chart -->
@@ -102,6 +152,52 @@
           @empty
           <p class="text-muted text-center py-3">Belum ada data</p>
           @endforelse
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="card-title mb-0">Pesanan User Terbaru</h4>
+          <a href="{{ route('staff.pembelian.index') }}" class="btn btn-sm btn-outline-primary">
+            Lihat Semua
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>User</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Tanggal</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($pesananTerbaru as $item)
+              <tr>
+                <td><span class="badge badge-primary">{{ $item->kode_transaksi }}</span></td>
+                <td>{{ $item->user->name ?? '-' }}</td>
+                <td>Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                <td><span class="badge badge-info text-capitalize">{{ $item->status }}</span></td>
+                <td>{{ $item->created_at->format('d M Y H:i') }}</td>
+              </tr>
+              @empty
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                  <p class="text-muted">Belum ada pesanan user</p>
+                </td>
+              </tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -5,6 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $kode_transaksi
+ * @property string|null $order_id
+ * @property string $status
+ * @property int|float $total_harga
+ * @property string|null $snap_token
+ * @property string|null $payment_type
+ * @property string|null $transaction_id
+ * @property \Illuminate\Support\Carbon|null $tanggal_bayar
+ * @property User|null $user
+ * @property \Illuminate\Database\Eloquent\Collection<int, DetailTransaksiPembelian> $details
+ */
+
 class TransaksiPembelian extends Model
 {
     use HasFactory;
@@ -68,7 +83,7 @@ class TransaksiPembelian extends Model
     }
 
     public function detailTransaksi()
-{
-    return $this->hasMany(DetailTransaksiPembelian::class, 'id_obat');
-}
+    {
+        return $this->hasMany(DetailTransaksiPembelian::class, 'id_obat');
+    }
 }

@@ -82,9 +82,7 @@ Route::middleware(['auth'])
     ->name('dokter.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('dokter.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [DokterDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/konsultasi',
             [DokterKonsultasiController::class, 'index']
@@ -105,6 +103,7 @@ Route::middleware(['auth'])
             ->name('jadwal.waktu.store');
         Route::delete('jadwal/waktu/{id}', [JadwalObatWaktuController::class, 'destroy'])
     ->name('jadwal.waktu.destroy');
+    Route::get('/jadwal/{id}', [JadwalController::class, 'show'])->name('dokter.jadwal.show');
 
        
 });
@@ -123,7 +122,7 @@ Route::middleware(['auth', 'role:staff'])
             ->name('dashboard');
 
         Route::resource('penjualan', App\Http\Controllers\Staff\PenjualanController::class)
-            ->only(['index', 'create', 'store', 'show']);
+            ->only(['index', 'show', 'edit', 'update', 'destroy']);
 
         Route::resource('pembelian', App\Http\Controllers\Staff\PembelianController::class)
             ->only(['index', 'show']);
@@ -165,15 +164,18 @@ Route::middleware(['auth', 'role:user'])
 
         Route::get('jadwal', [UserJadwalController::class, 'index'])->name('jadwal.index');
         Route::get('jadwal/{id}', [UserJadwalController::class, 'show'])->name('jadwal.show');
+        
             
     });
 
-    use App\Http\Controllers\TokoController;
-/*
-|--------------------------------------------------------------------------
-| TOKO
-|--------------------------------------------------------------------------
-*/
+
+    
+use App\Http\Controllers\TokoController;
+
+// Midtrans callback — di LUAR middleware auth (dipanggil server Midtrans)
+Route::post('/midtrans/callback', [TokoController::class, 'callback'])
+    ->name('midtrans.callback');
+
 Route::middleware(['auth', 'role:user'])
     ->prefix('toko')
     ->name('toko.')
@@ -187,6 +189,7 @@ Route::middleware(['auth', 'role:user'])
         Route::post('/beli-sekarang', [TokoController::class, 'beliSekarang'])->name('beliSekarang');
         Route::get('/checkout', [TokoController::class, 'checkout'])->name('checkout');
         Route::post('/checkout/proses', [TokoController::class, 'prosesCheckout'])->name('prosesCheckout');
+        Route::get('/pembayaran/{id}', [TokoController::class, 'pembayaran'])->name('pembayaran'); // ← tambah
         Route::get('/riwayat', [TokoController::class, 'riwayat'])->name('riwayat');
     });
  

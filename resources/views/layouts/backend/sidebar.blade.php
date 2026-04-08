@@ -12,7 +12,7 @@
         <li class="nav-item {{ request()->routeIs('admin.spesialisasi.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.spesialisasi.index') }}">
                 <i class="fas fa-stethoscope menu-icon"></i>
-                <span class="menu-title">Spesialisasi</span>
+                <span class="menu-title">Data Spesialisasi</span>
             </a>
         </li>
 
@@ -33,7 +33,7 @@
         </li>
 
         <!-- Obat -->
-        <li class="nav-item {{ request()->routeIs('admin.obat.index') || request()->routeIs('admin.obat.create') || request()->routeIs('admin.obat.edit') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('admin.obat.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.obat.index') }}">
                 <i class="fas fa-pills menu-icon"></i>
                 <span class="menu-title">Data Obat</span>
@@ -44,7 +44,7 @@
         <li class="nav-item {{ request()->routeIs('admin.obat.pembelian') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.obat.pembelian') }}">
                 <i class="fas fa-shopping-cart menu-icon"></i>
-                <span class="menu-title"> Data Pembelian Obat</span>
+                <span class="menu-title">Pembelian Obat</span>
             </a>
         </li>
 
@@ -52,7 +52,7 @@
         <li class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.users.index') }}">
                 <i class="icon-head menu-icon"></i>
-                <span class="menu-title">Data Users</span>
+                <span class="menu-title">Data User</span>
             </a>
         </li>
 

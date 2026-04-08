@@ -10,11 +10,10 @@
             </a>
         </li>
 
-        <!-- Penjualan Obat -->
-        <li class="nav-item {{ request()->routeIs('staff.penjualan.*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('staff.penjualan.index') }}">
-                <i class="fas fa-cash-register menu-icon"></i>
-                <span class="menu-title">Penjualan Obat</span>
+        <li class="nav-item {{ request()->routeIs('staff.pembelian.*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('staff.pembelian.index') }}">
+                <i class="fas fa-receipt menu-icon"></i>
+                <span class="menu-title">Pesanan User</span>
             </a>
         </li>
 

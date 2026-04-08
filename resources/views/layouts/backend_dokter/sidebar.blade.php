@@ -34,13 +34,13 @@
                     </a>
                 </li>
 
-                <!-- Jadwal Obat -->
                 <li class="nav-item {{ request()->routeIs('dokter.jadwal*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('dokter.jadwal.create') }}">
-                        <i class="icon-clock menu-icon"></i>
+                    <a class="nav-link" href="{{ route('dokter.jadwal.index') }}">
+                        <i class="fas fa-calendar-alt menu-icon"></i>
                         <span class="menu-title">Jadwal Obat</span>
                     </a>
                 </li>
+
 
                 <!-- Logout -->
                 <li class="nav-item">

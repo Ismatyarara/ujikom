@@ -3,10 +3,120 @@
 @section('title', 'Data Dokter')
 
 @section('content')
+<style>
+  .doctor-page {
+    background:
+      radial-gradient(circle at top right, rgba(79, 110, 247, 0.08), transparent 28%),
+      linear-gradient(180deg, #f8f9ff 0%, #f4f6fb 100%);
+    min-height: 100vh;
+    padding: 28px 0 48px;
+  }
+  .doctor-card {
+    border: 1px solid #edf1f7;
+    border-radius: 22px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+  }
+  .doctor-card .card-header {
+    background: #fff;
+    padding: 18px 24px;
+    border-bottom: 1px solid #eef2f7;
+  }
+  .doctor-card .card-body {
+    padding: 24px;
+    background: #fff;
+  }
+  .doctor-table {
+    margin-bottom: 0;
+    min-width: 1080px;
+  }
+  .doctor-table thead th {
+    background: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 14px 16px;
+  }
+  .doctor-table tbody td {
+    vertical-align: middle;
+    padding: 16px;
+    border-color: #eef2f7;
+  }
+  .doctor-row:hover {
+    background: #fafcff;
+  }
+  .doctor-avatar {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #f1f5f9;
+  }
+  .doctor-avatar-placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #eff4ff;
+    color: #4f46e5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .doctor-name {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+  .doctor-email,
+  .doctor-subtext {
+    font-size: 0.82rem;
+    color: #64748b;
+  }
+  .doctor-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    background: #eff6ff;
+    color: #2563eb;
+  }
+  .doctor-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .doctor-action-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+  }
+  .doctor-action-btn.view { background: #3b82f6; }
+  .doctor-action-btn.edit { background: #f59e0b; }
+  .doctor-action-btn.delete { background: #ef4444; }
+  .doctor-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+  }
+</style>
+
+<div class="doctor-page">
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
-      <div class="card">
+      <div class="card doctor-card">
 
         <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="mb-0">Data Dokter</h4>
@@ -25,7 +135,7 @@
           @endif
 
           <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table class="table doctor-table">
               <thead>
                 <tr>
                   <th>No</th>
@@ -41,38 +151,53 @@
               </thead>
               <tbody>
                 @forelse($dokters as $i => $dokter)
-                  <tr>
-                    <td>{{ $dokters->firstItem() + $i }}</td>
+                  <tr class="doctor-row">
+                    <td class="fw-semibold">{{ $dokters->firstItem() + $i }}</td>
                     <td>
-                      <img src="{{ $dokter->foto ? asset('storage/'.$dokter->foto) : asset('images/default-avatar.png') }}"
-                           class="img-thumbnail"
-                           style="max-width:70px">
+                      @if($dokter->foto)
+                        <img src="{{ asset('storage/'.$dokter->foto) }}"
+                             class="doctor-avatar"
+                             alt="{{ $dokter->nama }}">
+                      @else
+                        <span class="doctor-avatar-placeholder">
+                          <i class="fas fa-user-md"></i>
+                        </span>
+                      @endif
                     </td>
-                    <td>{{ $dokter->nama }}</td>
-                    <td>{{ $dokter->pengguna->email ?? '-' }}</td>
-                    <td>{{ $dokter->spesialisasi->name ?? '-' }}</td>
                     <td>
-                      <small>
+                      <div class="doctor-name">{{ $dokter->nama }}</div>
+                      <div class="doctor-subtext">ID Dokter #{{ $dokter->id }}</div>
+                    </td>
+                    <td>
+                      <div class="doctor-email">{{ $dokter->pengguna->email ?? '-' }}</div>
+                    </td>
+                    <td>
+                      <span class="doctor-badge">{{ $dokter->spesialisasi->name ?? '-' }}</span>
+                    </td>
+                    <td>
+                      <div class="doctor-subtext">
                         {{ Str::limit($dokter->pengalaman ?? '-', 50) }}
-                      </small>
+                      </div>
                     </td>
-                    <td>{{ $dokter->tempat_praktik }}</td>
                     <td>
-                      <small>
+                      <div class="doctor-subtext">{{ $dokter->tempat_praktik }}</div>
+                    </td>
+                    <td>
+                      <div class="doctor-subtext">
                         {{ $dokter->jadwal_praktik_hari }} <br>
                         {{ $dokter->jadwal_praktik_waktu }}
-                      </small>
+                      </div>
                     </td>
                     <td>
-                      <div class="btn-group btn-group-sm">
-                        <a href="{{ route('admin.dokter.show', $dokter->id) }}" class="btn btn-info">
+                      <div class="doctor-actions">
+                        <a href="{{ route('admin.dokter.show', $dokter->id) }}" class="doctor-action-btn view" title="Lihat">
                           <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ route('admin.dokter.edit', $dokter->id) }}" class="btn btn-warning">
+                        <a href="{{ route('admin.dokter.edit', $dokter->id) }}" class="doctor-action-btn edit" title="Edit">
                           <i class="fas fa-edit"></i>
                         </a>
-                        <button class="btn btn-danger"
-                          onclick="confirmDelete({{ $dokter->id }})">
+                        <button class="doctor-action-btn delete"
+                          onclick="confirmDelete({{ $dokter->id }})" title="Hapus">
                           <i class="fas fa-trash"></i>
                         </button>
                       </div>
@@ -87,7 +212,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="9" class="text-center">Tidak ada data dokter</td>
+                    <td colspan="9" class="doctor-empty">Tidak ada data dokter</td>
                   </tr>
                 @endforelse
               </tbody>
@@ -100,6 +225,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <script>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Login — HealTack</title>
+  <title>Login - HealTack</title>
 
   <link rel="stylesheet" href="{{ asset('assets/vendors/feather/feather.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/vendors/ti-icons/css/themify-icons.css') }}">
@@ -22,7 +22,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      padding: 24px 16px;
+      overflow-x: hidden;
+      overflow-y: auto;
       position: relative;
     }
     body::before {
@@ -45,7 +47,7 @@
     }
     @keyframes glow {
       0%,100% { transform: scale(1); opacity: 1; }
-      50%      { transform: scale(1.08); opacity: .6; }
+      50% { transform: scale(1.08); opacity: .6; }
     }
 
     .login-card {
@@ -61,7 +63,7 @@
     }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(40px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .login-card::before {
       content: '';
@@ -74,7 +76,7 @@
     }
     @keyframes bar {
       from { background-position: 0% 0%; }
-      to   { background-position: 200% 0%; }
+      to { background-position: 200% 0%; }
     }
 
     .logo-wrap {
@@ -87,7 +89,7 @@
     .logo-text span { color: #1A56DB; }
 
     .card-title { text-align: center; font-size: 22px; font-weight: 800; color: #0C1D3B; margin-bottom: 4px; }
-    .card-sub   { text-align: center; font-size: 14px; color: #64748B; margin-bottom: 28px; }
+    .card-sub { text-align: center; font-size: 14px; color: #64748B; margin-bottom: 28px; }
 
     .divider {
       display: flex; align-items: center; gap: 12px;
@@ -95,7 +97,6 @@
     }
     .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
 
-    /* Google button — with OTP badge */
     .btn-google {
       display: flex; align-items: center; justify-content: center; gap: 10px;
       width: 100%; padding: 13px 16px;
@@ -183,6 +184,16 @@
       border-radius: 10px; padding: 12px 16px;
       font-size: 13px; color: #92400E; margin-bottom: 18px;
     }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 34px 22px;
+        border-radius: 18px;
+      }
+
+      .card-title { font-size: 20px; }
+      .card-sub { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
@@ -230,7 +241,7 @@
           <i class="ti-lock input-icon"></i>
           <input type="password" id="password" name="password"
             class="form-control @error('password') is-invalid @enderror"
-            placeholder="••••••••"
+            placeholder="Masukkan password"
             required>
         </div>
         @error('password')

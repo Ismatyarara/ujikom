@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Edit Profile')
+@section('title', 'Edit Profil')
 
 @section('content')
 <div class="content-wrapper">
@@ -8,7 +8,10 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="card-title mb-0">Edit Profile</h4>
+                        <div>
+                            <h4 class="card-title mb-1">Edit Profil</h4>
+                            <p class="text-muted mb-0">Perbarui data profil agar informasi akun tetap akurat.</p>
+                        </div>
                         <div>
                             <a href="{{ route('user.profile.show') }}" class="btn btn-sm btn-secondary">
                                 <i class="icon-arrow-left"></i> Kembali
@@ -29,7 +32,7 @@
                         @csrf
                         @method('PUT')
                         
-                        <!-- Foto Profile Saat Ini -->
+                        <!-- Foto Profil Saat Ini -->
                         <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Foto Saat Ini</label>
                             <div class="col-sm-9">
@@ -37,7 +40,7 @@
                                     <img src="{{ asset('storage/'.$profile->foto) }}" 
                                          class="img-thumbnail mb-2" 
                                          style="max-width: 200px;" 
-                                         alt="Foto Profile">
+                                         alt="Foto Profil">
                                 @else
                                     <div class="bg-secondary text-white rounded d-inline-flex align-items-center justify-content-center mb-2" 
                                          style="width: 200px; height: 200px;">
@@ -168,7 +171,7 @@
                         <!-- Upload Foto Baru -->
                         <div class="form-group row">
                             <label for="foto" class="col-sm-3 col-form-label">
-                                Ganti Foto Profile
+                                Ganti Foto Profil
                             </label>
                             <div class="col-sm-9">
                                 <input type="file" 
@@ -190,7 +193,7 @@
                         <div class="form-group row">
                             <div class="col-sm-9 offset-sm-3">
                                 <button type="submit" class="btn btn-primary mr-2">
-                                    <i class="icon-check"></i> Update Profile
+                                    <i class="icon-check"></i> Update Profil
                                 </button>
                                 <a href="{{ route('user.profile.show') }}" class="btn btn-light">
                                     <i class="icon-close"></i> Batal

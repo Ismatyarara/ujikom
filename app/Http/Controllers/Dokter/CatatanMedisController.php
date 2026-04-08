@@ -11,96 +11,128 @@ use Illuminate\Support\Facades\Auth;
 
 class CatatanMedisController extends Controller
 {
-    // ================= INDEX =================
-    public function index()
+    protected function getDokterAktif(): Dokter
     {
-        $user = Auth::user();
-        
-        $dokter = Dokter::where('user_id', $user->id)->first();
+        return Dokter::where('user_id', Auth::id())->firstOrFail();
+    }
 
-        $catatan = CatatanMedis::where('dokter_id', $dokter->id)
-            ->latest('tanggal_catatan')
-            ->get();
+    protected function getCatatanDokter(int $id): CatatanMedis
+    {
+        $dokter = $this->getDokterAktif();
 
-        return view('dokter.catatan.index', compact('catatan'));
+        return CatatanMedis::where('dokter_id', $dokter->id)
+            ->with(['user', 'dokter'])
+            ->findOrFail($id);
+    }
+
+    // ================= INDEX =================
+    public function index(Request $request)
+    {
+        $dokter = $this->getDokterAktif();
+
+        $query = CatatanMedis::where('dokter_id', $dokter->id)
+            ->latest('tanggal_catatan');
+
+        if ($request->filled('kode_pasien')) {
+            $query->whereHas('user', fn($q) =>
+                $q->where('kode_pasien', $request->kode_pasien)
+            );
+        }
+
+        $catatan      = $query->get();
+        $pasienDicari = null;
+
+        if ($request->filled('kode_pasien')) {
+            $pasienDicari = User::where('kode_pasien', $request->kode_pasien)
+                ->where('role', 'user')
+                ->first();
+        }
+
+        return view('dokter.catatan.index', compact('catatan', 'pasienDicari'));
     }
 
     // ================= CREATE =================
-    public function create()
+    public function create(Request $request)
     {
-        $pasien = User::where('role', 'user')->orderBy('name')->get();
-        
-        return view('dokter.catatan.create', compact('pasien'));
+        $selectedUserId = $request->user_id ? (int) $request->user_id : null;
+        $selectedPasien = null;
+
+        if ($selectedUserId) {
+            $selectedPasien = User::where('role', 'user')->findOrFail($selectedUserId);
+        }
+
+        $pasien = $selectedPasien
+            ? collect()
+            : User::where('role', 'user')->orderBy('name')->get();
+
+        return view('dokter.catatan.create', compact('pasien', 'selectedUserId', 'selectedPasien'));
     }
 
     // ================= STORE =================
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required',
-            'keluhan' => 'required',
-            'diagnosa' => 'required',
+            'user_id'         => 'required|exists:users,id',
+            'keluhan'         => 'required|string',
+            'diagnosa'        => 'required|string',
             'tanggal_catatan' => 'required|date',
         ]);
 
-        $dokter = Dokter::where('user_id', Auth::id())->first();
+        $dokter = $this->getDokterAktif();
+        $pasien = User::where('role', 'user')->findOrFail((int) $request->user_id);
 
         CatatanMedis::create([
-            'user_id' => $request->user_id,
-            'dokter_id' => $dokter->id,
-            'keluhan' => $request->keluhan,
-            'diagnosa' => $request->diagnosa,
-            'deskripsi' => $request->deskripsi,
+            'user_id'         => $pasien->id,
+            'dokter_id'       => $dokter->id,
+            'keluhan'         => $request->keluhan,
+            'diagnosa'        => $request->diagnosa,
+            'deskripsi'       => $request->deskripsi,
             'tanggal_catatan' => $request->tanggal_catatan,
         ]);
 
         return redirect()->route('dokter.catatan.index')
-            ->with('success', 'Catatan berhasil ditambahkan');
+            ->with('success', 'Catatan berhasil ditambahkan.');
     }
 
     // ================= EDIT =================
     public function edit($id)
     {
-        $catatan = CatatanMedis::findOrFail($id);
-        $pasien = User::where('role', 'user')->orderBy('name')->get();
-        
-        return view('dokter.catatan.edit', compact('catatan', 'pasien'));
+        $catatan = $this->getCatatanDokter((int) $id);
+
+        return view('dokter.catatan.edit', compact('catatan'));
     }
 
     // ================= UPDATE =================
     public function update(Request $request, $id)
     {
         $request->validate([
-            'user_id' => 'required',
-            'keluhan' => 'required',
-            'diagnosa' => 'required',
+            'keluhan'         => 'required|string',
+            'diagnosa'        => 'required|string',
             'tanggal_catatan' => 'required|date',
         ]);
 
-        $catatan = CatatanMedis::findOrFail($id);
-        
-        $dokter = Dokter::where('user_id', Auth::id())->first();
+        $catatan = $this->getCatatanDokter((int) $id);
+        $dokter  = $this->getDokterAktif();
 
         $catatan->update([
-            'user_id' => $request->user_id,
-            'dokter_id' => $dokter->id,
-            'keluhan' => $request->keluhan,
-            'diagnosa' => $request->diagnosa,
-            'deskripsi' => $request->deskripsi,
+            'dokter_id'       => $dokter->id,
+            'keluhan'         => $request->keluhan,
+            'diagnosa'        => $request->diagnosa,
+            'deskripsi'       => $request->deskripsi,
             'tanggal_catatan' => $request->tanggal_catatan,
         ]);
 
         return redirect()->route('dokter.catatan.index')
-            ->with('success', 'Catatan berhasil diperbarui');
+            ->with('success', 'Catatan berhasil diperbarui.');
     }
 
     // ================= DESTROY =================
     public function destroy($id)
     {
-        $catatan = CatatanMedis::findOrFail($id);
+        $catatan = $this->getCatatanDokter((int) $id);
         $catatan->delete();
 
         return redirect()->route('dokter.catatan.index')
-            ->with('success', 'Catatan berhasil dihapus');
+            ->with('success', 'Catatan berhasil dihapus.');
     }
 }

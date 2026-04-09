@@ -9,14 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class UserJadwalController extends Controller
 {
-      public function index()
+    public function index()
     {
+        $currentUser = Auth::user();
+
         $jadwals = Jadwal::with(['dokter', 'waktuObat'])
-            ->where('user_id', Auth::id())
+            ->where('user_id', $currentUser->id)
             ->orderByDesc('created_at')
             ->get();
 
-        return view('user.jadwal.index', compact('jadwals'));
+        return view('user.jadwal.index', compact('jadwals', 'currentUser'));
     }
 
     public function show($id)

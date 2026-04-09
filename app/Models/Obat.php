@@ -5,14 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property int $id
- * @property string $nama_obat
- * @property int|float $harga
- * @property int $stok
- * @property string|null $satuan
- */
-
 class Obat extends Model
 {
     use HasFactory;
@@ -30,26 +22,23 @@ class Obat extends Model
         'harga',
         'satuan',
         'status',
-        'user_id', // Tambahkan ini jika belum ada
+        'user_id',
     ];
 
-    // Cast status ke boolean
     protected $casts = [
-        'status' => 'boolean',
         'tanggal_kadaluarsa' => 'date',
-        'stok' => 'integer',
+        'stok'               => 'integer',
+        'harga'              => 'float',
+        'status'             => 'boolean',
     ];
 
-    // public function staff()
-    // {
-    //     return $this->belongsTo(User::class, 'users_id');
-    // }
+    // ==================== Relationships ====================
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Relasi
     public function barangMasuk()
     {
         return $this->hasMany(BarangMasuk::class, 'id_obat');
@@ -60,26 +49,38 @@ class Obat extends Model
         return $this->hasMany(BarangKeluar::class, 'id_obat');
     }
 
-    public function getFotoUrlAttribute()
+    // ==================== Accessors ====================
+
+    public function getFotoUrlAttribute(): string
     {
-        return $this->foto 
-            ? asset('storage/' . $this->foto) 
+        return $this->foto
+            ? asset('storage/' . $this->foto)
             : asset('assets/images/obat-default.png');
     }
 
-    // Scope untuk filter obat tersedia
+    public function getIsAktifAttribute(): bool
+    {
+        $status = $this->getRawOriginal('status');
+
+        if (is_bool($status) || is_numeric($status)) {
+            return (bool) $status;
+        }
+
+        return strtolower(trim((string) $status)) === 'aktif';
+    }
+
+    // ==================== Scopes ====================
+
     public function scopeTersedia($query)
     {
         return $query->where('stok', '>', 0);
     }
 
-    // Scope untuk filter stok menipis
-    public function scopeStokMenupis($query, $batas = 10)
+    public function scopeStokMenupis($query, int $batas = 10)
     {
-        return $query->where('stok', '<=', $batas)->where('stok', '>', 0);
+        return $query->whereBetween('stok', [1, $batas]);
     }
 
-    // Scope untuk filter stok habis
     public function scopeStokHabis($query)
     {
         return $query->where('stok', 0);

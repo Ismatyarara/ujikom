@@ -57,6 +57,7 @@
 
     /* ── Table card ── */
     .table-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.06); overflow: hidden; }
+    .table-responsive { overflow-x: auto; }
     .table-card table { width: 100%; border-collapse: collapse; }
     .table-card thead th { background: var(--blue-50); color: var(--blue-900); font-size: 13px;
                             font-weight: 700; padding: 13px 14px; border-bottom: 2px solid var(--blue-100); }
@@ -132,6 +133,7 @@
 
     {{-- Table --}}
     <div class="table-card">
+        <div class="table-responsive">
         <table>
             <thead>
                 <tr>
@@ -148,7 +150,7 @@
             <tbody>
                 @forelse($catatan as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ ($catatan->currentPage() - 1) * $catatan->perPage() + $loop->iteration }}</td>
                     <td>
                         <div class="patient-name">{{ $item->user->name }}</div>
                         <div class="patient-code">{{ $item->user->kode_pasien }}</div>
@@ -220,6 +222,11 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex justify-content-center">
+        {{ $catatan->links() }}
     </div>
 
 </div>

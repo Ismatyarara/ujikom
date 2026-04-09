@@ -17,7 +17,7 @@ class ReminderMinumObat extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: '⏰ Pengingat Minum Obat');
+        return new Envelope(subject: 'Pengingat Minum Obat');
     }
 
     public function content(): Content

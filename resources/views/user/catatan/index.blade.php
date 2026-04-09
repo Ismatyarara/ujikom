@@ -27,7 +27,7 @@
                             <tbody>
                                 @forelse($catatan as $item)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ ($catatan->currentPage() - 1) * $catatan->perPage() + $loop->iteration }}</td>
                                     <td>
                                         <strong>{{ $item->diagnosa }}</strong>
                                     </td>
@@ -64,6 +64,9 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-center">
+                {{ $catatan->links() }}
             </div>
         </div>
     </div>

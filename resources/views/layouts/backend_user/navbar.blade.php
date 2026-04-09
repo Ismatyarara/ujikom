@@ -58,7 +58,9 @@
           @if(Auth::user()->profile && Auth::user()->profile->foto)
             <img src="{{ asset('storage/'.Auth::user()->profile->foto) }}" alt="profile"/>
           @else
-            <img src="{{ asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
+            <span style="width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e0e7ff;color:#3730a3;font-weight:700;">
+              {{ Auth::user()->initials }}
+            </span>
           @endif
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">

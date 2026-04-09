@@ -185,7 +185,7 @@
           </div>
           <div class="col-6 mb-3">
             <a href="{{ route('admin.obat.pembelian') }}" class="btn btn-outline-warning btn-block">
-              <i class="fas fa-pills"></i> Lihat Pembelian
+              <i class="fas fa-pills"></i> Monitoring Pembelian
             </a>
           </div>
           <div class="col-6 mb-3">

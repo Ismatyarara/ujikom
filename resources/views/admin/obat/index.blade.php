@@ -8,17 +8,15 @@
         <div class="card">
             <div class="card-body">
 
-                {{-- Header --}}
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="card-title mb-0">Data Obat</h4>
                 </div>
 
-                {{-- Table --}}
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>No</th>
+                                <th>#</th>
                                 <th>Kode</th>
                                 <th>Foto</th>
                                 <th>Nama Obat</th>
@@ -27,46 +25,48 @@
                                 <th>Stok</th>
                                 <th>Ditambahkan</th>
                                 <th>Diubah</th>
-                                <th>Ditambahkan Oleh</th>
+                                <th>Oleh</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($obat as $key => $item)
+                            @forelse ($obat as $key => $item)
                                 <tr>
                                     <td>{{ $obat->firstItem() + $key }}</td>
                                     <td>{{ $item->kode_obat }}</td>
                                     <td>
-                                        <img src="{{ $item->foto_url }}" class="img-thumbnail" width="50" height="50"
-                                            style="object-fit:cover">
+                                        <img src="{{ $item->foto_url }}"
+                                             class="img-thumbnail"
+                                             width="50"
+                                             height="50"
+                                             style="object-fit: cover"
+                                             alt="{{ $item->nama_obat }}">
                                     </td>
                                     <td>{{ $item->nama_obat }}</td>
                                     <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
-                                    <td>{{ $item->satuan }}</td>
+                                    <td>{{ $item->satuan ?? '-' }}</td>
                                     <td>{{ $item->stok }}</td>
                                     <td>{{ $item->created_at->format('d/m/Y H:i') }}</td>
                                     <td>{{ $item->updated_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $item->user->name ?? '-' }}</td>
                                     <td>
-                                        {{$item->user->name}}
+                                        <span class="badge {{ $item->is_aktif ? 'bg-success' : 'bg-secondary' }}">
+                                            {{ $item->is_aktif ? 'Aktif' : 'Nonaktif' }}
+                                        </span>
                                     </td>
                                     <td>
-                                        @if ($item->status === 'aktif')
-                                            <span class="badge bg-success">Aktif</span>
-                                        @else
-                                            <span class="badge bg-secondary">Nonaktif</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.obat.show', $item->id) }}" class="btn btn-info btn-sm mb-1">
+                                        <a href="{{ route('admin.obat.show', $item->id) }}"
+                                           class="btn btn-info btn-sm"
+                                           title="Lihat Detail">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="text-center text-muted py-4">
-                                        <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                    <td colspan="12" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                         Belum ada data obat
                                     </td>
                                 </tr>
@@ -75,7 +75,6 @@
                     </table>
                 </div>
 
-                {{-- Pagination --}}
                 <div class="mt-3">
                     {{ $obat->links() }}
                 </div>

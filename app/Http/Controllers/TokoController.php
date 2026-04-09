@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obat;
 use App\Models\BarangKeluar;
-use App\Models\TransaksiPembelian;
 use App\Models\DetailTransaksiPembelian;
+use App\Models\Obat;
+use App\Models\TransaksiPembelian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,23 +19,21 @@ class TokoController extends Controller
 {
     public function __construct()
     {
-        Config::$serverKey    = config('midtrans.server_key');
+        Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized  = config('midtrans.is_sanitized', true);
-        Config::$is3ds        = config('midtrans.is_3ds', true);
+        Config::$isSanitized = config('midtrans.is_sanitized', true);
+        Config::$is3ds = config('midtrans.is_3ds', true);
     }
 
-    // ─── Toko ────────────────────────────────────────────────────────────────
-
-    public function index()
+    public function index(Request $request)
     {
-        $search = trim((string) request('search'));
+        $search = trim((string) $request->search);
 
         $obat = Obat::where('status', true)
             ->where('stok', '>', 0)
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($innerQuery) use ($search) {
-                    $innerQuery->where('nama_obat', 'like', "%{$search}%")
+            ->when($search != '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_obat', 'like', "%{$search}%")
                         ->orWhere('kode_obat', 'like', "%{$search}%")
                         ->orWhere('deskripsi', 'like', "%{$search}%");
                 });
@@ -43,7 +41,7 @@ class TokoController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $totalKeranjang = count(session()->get('keranjang', []));
+        $totalKeranjang = count($this->getKeranjang());
 
         return view('user.beli-obat.index', compact('obat', 'totalKeranjang', 'search'));
     }
@@ -55,35 +53,44 @@ class TokoController extends Controller
         return view('user.beli-obat.show', compact('obat'));
     }
 
-    // ─── Keranjang ───────────────────────────────────────────────────────────
-
     public function keranjang()
     {
-        $keranjang = session()->get('keranjang', []);
-        $total     = collect($keranjang)->sum('subtotal');
+        $keranjang = $this->getKeranjang();
+        $total = collect($keranjang)->sum('subtotal');
 
         return view('user.beli-obat.keranjang', compact('keranjang', 'total'));
     }
 
     public function tambahKeranjang(Request $request)
     {
-        $obat      = Obat::findOrFail($request->id_obat);
-        $keranjang = session()->get('keranjang', []);
-        $jumlah    = $request->jumlah ?? 1;
+        $request->validate([
+            'id_obat' => 'required|exists:obat,id',
+            'jumlah' => 'nullable|integer|min:1',
+        ]);
+
+        $obat = Obat::findOrFail($request->id_obat);
+        $jumlah = (int) ($request->jumlah ?? 1);
+        $keranjang = $this->getKeranjang();
+
+        if ($obat->stok < 1) {
+            return back()->with('error', 'Stok obat tidak tersedia.');
+        }
+
+        if ($jumlah > $obat->stok) {
+            $jumlah = $obat->stok;
+        }
 
         if (isset($keranjang[$obat->id])) {
-            $keranjang[$obat->id]['jumlah']  += $jumlah;
-            $keranjang[$obat->id]['subtotal'] = $keranjang[$obat->id]['jumlah'] * $obat->harga;
+            $jumlahBaru = $keranjang[$obat->id]['jumlah'] + $jumlah;
+
+            if ($jumlahBaru > $obat->stok) {
+                $jumlahBaru = $obat->stok;
+            }
+
+            $keranjang[$obat->id]['jumlah'] = $jumlahBaru;
+            $keranjang[$obat->id]['subtotal'] = $jumlahBaru * $obat->harga;
         } else {
-            $keranjang[$obat->id] = [
-                'id_obat'   => $obat->id,
-                'nama_obat' => $obat->nama_obat,
-                'harga'     => $obat->harga,
-                'jumlah'    => $jumlah,
-                'subtotal'  => $jumlah * $obat->harga,
-                'satuan'    => $obat->satuan,
-                'foto'      => $obat->foto,
-            ];
+            $keranjang[$obat->id] = $this->formatItemKeranjang($obat, $jumlah);
         }
 
         session()->put('keranjang', $keranjang);
@@ -93,19 +100,24 @@ class TokoController extends Controller
 
     public function beliSekarang(Request $request)
     {
-        $obat   = Obat::findOrFail($request->id_obat);
-        $jumlah = $request->jumlah ?? 1;
+        $request->validate([
+            'id_obat' => 'required|exists:obat,id',
+            'jumlah' => 'nullable|integer|min:1',
+        ]);
+
+        $obat = Obat::findOrFail($request->id_obat);
+        $jumlah = (int) ($request->jumlah ?? 1);
+
+        if ($obat->stok < 1) {
+            return redirect()->route('toko.index')->with('error', 'Stok obat tidak tersedia.');
+        }
+
+        if ($jumlah > $obat->stok) {
+            $jumlah = $obat->stok;
+        }
 
         session()->put('keranjang', [
-            $obat->id => [
-                'id_obat'   => $obat->id,
-                'nama_obat' => $obat->nama_obat,
-                'harga'     => $obat->harga,
-                'jumlah'    => $jumlah,
-                'subtotal'  => $jumlah * $obat->harga,
-                'satuan'    => $obat->satuan,
-                'foto'      => $obat->foto,
-            ],
+            $obat->id => $this->formatItemKeranjang($obat, $jumlah),
         ]);
 
         return redirect()->route('toko.checkout');
@@ -113,10 +125,10 @@ class TokoController extends Controller
 
     public function updateKeranjang(Request $request)
     {
-        $keranjang = session()->get('keranjang', []);
+        $keranjang = $this->getKeranjang();
 
         if (isset($keranjang[$request->id_obat])) {
-            $keranjang[$request->id_obat]['jumlah']  = $request->jumlah;
+            $keranjang[$request->id_obat]['jumlah'] = $request->jumlah;
             $keranjang[$request->id_obat]['subtotal'] = $request->jumlah * $keranjang[$request->id_obat]['harga'];
         }
 
@@ -127,18 +139,16 @@ class TokoController extends Controller
 
     public function hapusKeranjang($id)
     {
-        $keranjang = session()->get('keranjang', []);
+        $keranjang = $this->getKeranjang();
         unset($keranjang[$id]);
         session()->put('keranjang', $keranjang);
 
         return back()->with('success', 'Obat dihapus dari keranjang.');
     }
 
-    // ─── Checkout ────────────────────────────────────────────────────────────
-
     public function checkout()
     {
-        $keranjang = session()->get('keranjang', []);
+        $keranjang = $this->getKeranjang();
 
         if (empty($keranjang)) {
             return redirect()->route('toko.keranjang');
@@ -153,67 +163,60 @@ class TokoController extends Controller
     {
         $request->validate([
             'alamat_pengiriman' => 'required|string',
-            'no_telepon'        => 'required|string',
+            'no_telepon' => 'required|string',
         ]);
 
-        $keranjang = session()->get('keranjang', []);
+        $keranjang = $this->getKeranjang();
 
         if (empty($keranjang)) {
             return redirect()->route('toko.keranjang');
         }
 
-        $total = collect($keranjang)->sum('subtotal');
-        $kode  = 'TRX-' . strtoupper(Str::random(8));
-
-        $transaksi = TransaksiPembelian::create([
-            'kode_transaksi'    => $kode,
-            'user_id'           => Auth::id(),
-            'total_harga'       => $total,
-            'status'            => 'pending',
-            'alamat_pengiriman' => $request->alamat_pengiriman,
-            'no_telepon'        => $request->no_telepon,
-            'catatan'           => $request->catatan,
-            'order_id'          => $kode,
-        ]);
-
-        foreach ($keranjang as $item) {
-            DetailTransaksiPembelian::create([
-                'transaksi_pembelian_id' => $transaksi->id,
-                'id_obat'                => $item['id_obat'],
-                'jumlah'                 => $item['jumlah'],
-                'harga_satuan'           => $item['harga'],
-                'subtotal'               => $item['subtotal'],
-            ]);
+        if (session()->pull('checkout_in_progress')) {
+            return redirect()->route('toko.riwayat')
+                ->with('info', 'Pesanan sebelumnya sedang diproses. Silakan cek riwayat pembelian.');
         }
 
-        $params = [
-            'transaction_details' => [
-                'order_id'     => $kode,
-                'gross_amount' => (int) $total,
-            ],
-            'customer_details' => [
-                'first_name' => Auth::user()->name,
-                'email'      => Auth::user()->email,
-                'phone'      => $request->no_telepon,
-            ],
-            'item_details' => collect($keranjang)->map(fn ($item) => [
-                'id'       => $item['id_obat'],
-                'price'    => (int) $item['harga'],
-                'quantity' => $item['jumlah'],
-                'name'     => $item['nama_obat'],
-            ])->values()->toArray(),
-        ];
+        session()->put('checkout_in_progress', true);
 
-        $snapToken = Snap::getSnapToken($params);
-        $transaksi->update(['snap_token' => $snapToken]);
+        try {
+            $total = collect($keranjang)->sum('subtotal');
+            $kode = 'TRX-' . strtoupper(Str::random(8));
 
-        session()->forget('keranjang');
+            $transaksi = TransaksiPembelian::create([
+                'kode_transaksi' => $kode,
+                'user_id' => Auth::id(),
+                'total_harga' => $total,
+                'status' => 'pending',
+                'alamat_pengiriman' => $request->alamat_pengiriman,
+                'no_telepon' => $request->no_telepon,
+                'catatan' => $request->catatan,
+                'order_id' => $kode,
+            ]);
 
-        return redirect()->route('toko.pembayaran', $transaksi->id)
-            ->with('success', 'Pesanan berhasil dibuat. Silakan lakukan pembayaran.');
+            foreach ($keranjang as $item) {
+                DetailTransaksiPembelian::create([
+                    'transaksi_pembelian_id' => $transaksi->id,
+                    'id_obat' => $item['id_obat'],
+                    'jumlah' => $item['jumlah'],
+                    'harga_satuan' => $item['harga'],
+                    'subtotal' => $item['subtotal'],
+                ]);
+            }
+
+            $snapToken = Snap::getSnapToken($this->buatPayloadMidtransDariKeranjang($kode, $total, $keranjang, $request->no_telepon));
+            $transaksi->update(['snap_token' => $snapToken]);
+
+            session()->forget('keranjang');
+            session()->forget('checkout_in_progress');
+
+            return redirect()->route('toko.pembayaran', $transaksi->id)
+                ->with('success', 'Pesanan berhasil dibuat. Silakan lakukan pembayaran.');
+        } catch (\Throwable $e) {
+            session()->forget('checkout_in_progress');
+            throw $e;
+        }
     }
-
-    // ─── Pembayaran ──────────────────────────────────────────────────────────
 
     public function pembayaran($id)
     {
@@ -232,25 +235,7 @@ class TokoController extends Controller
         }
 
         if (empty($transaksi->snap_token)) {
-            $params = [
-                'transaction_details' => [
-                    'order_id'     => $transaksi->kode_transaksi,
-                    'gross_amount' => (int) $transaksi->total_harga,
-                ],
-                'customer_details' => [
-                    'first_name' => Auth::user()->name,
-                    'email'      => Auth::user()->email,
-                    'phone'      => $transaksi->no_telepon,
-                ],
-                'item_details' => $transaksi->details->map(fn ($d) => [
-                    'id'       => $d->id_obat,
-                    'price'    => (int) $d->harga_satuan,
-                    'quantity' => $d->jumlah,
-                    'name'     => $d->obat->nama_obat,
-                ])->values()->toArray(),
-            ];
-
-            $snapToken = Snap::getSnapToken($params);
+            $snapToken = Snap::getSnapToken($this->buatPayloadMidtransDariTransaksi($transaksi));
             $transaksi->update(['snap_token' => $snapToken]);
         }
 
@@ -258,8 +243,6 @@ class TokoController extends Controller
 
         return view('user.beli-obat.pembayaran', compact('transaksi', 'snapToken'));
     }
-
-    // ─── Midtrans Callback ───────────────────────────────────────────────────
 
     public function callback(Request $request)
     {
@@ -309,15 +292,13 @@ class TokoController extends Controller
         ]);
 
         $transaksi = TransaksiPembelian::where('order_id', $orderId)
-            ->with('details')
+            ->with('details', 'user')
             ->firstOrFail();
 
         $this->applyMidtransStatus($transaksi, $payload, $status, $fraud);
 
         return response()->json(['status' => 'ok']);
     }
-
-    // ─── Riwayat ─────────────────────────────────────────────────────────────
 
     public function riwayat()
     {
@@ -336,6 +317,70 @@ class TokoController extends Controller
         return view('user.beli-obat.riwayat', compact('transaksi'));
     }
 
+    protected function getKeranjang(): array
+    {
+        return session()->get('keranjang', []);
+    }
+
+    protected function formatItemKeranjang(Obat $obat, int $jumlah): array
+    {
+        return [
+            'id_obat' => $obat->id,
+            'nama_obat' => $obat->nama_obat,
+            'harga' => $obat->harga,
+            'jumlah' => $jumlah,
+            'subtotal' => $jumlah * $obat->harga,
+            'satuan' => $obat->satuan,
+            'foto' => $obat->foto,
+        ];
+    }
+
+    protected function buatPayloadMidtransDariKeranjang(string $kode, int|float $total, array $keranjang, string $noTelepon): array
+    {
+        return [
+            'transaction_details' => [
+                'order_id' => $kode,
+                'gross_amount' => (int) $total,
+            ],
+            'customer_details' => [
+                'first_name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                'phone' => $noTelepon,
+            ],
+            'item_details' => collect($keranjang)->map(function ($item) {
+                return [
+                    'id' => $item['id_obat'],
+                    'price' => (int) $item['harga'],
+                    'quantity' => $item['jumlah'],
+                    'name' => $item['nama_obat'],
+                ];
+            })->values()->toArray(),
+        ];
+    }
+
+    protected function buatPayloadMidtransDariTransaksi(TransaksiPembelian $transaksi): array
+    {
+        return [
+            'transaction_details' => [
+                'order_id' => $transaksi->kode_transaksi,
+                'gross_amount' => (int) $transaksi->total_harga,
+            ],
+            'customer_details' => [
+                'first_name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                'phone' => $transaksi->no_telepon,
+            ],
+            'item_details' => $transaksi->details->map(function ($detail) {
+                return [
+                    'id' => $detail->id_obat,
+                    'price' => (int) $detail->harga_satuan,
+                    'quantity' => $detail->jumlah,
+                    'name' => $detail->obat->nama_obat,
+                ];
+            })->values()->toArray(),
+        ];
+    }
+
     protected function syncStatusFromMidtrans(TransaksiPembelian $transaksi): void
     {
         if (empty($transaksi->order_id)) {
@@ -349,7 +394,7 @@ class TokoController extends Controller
             $fraud = $payload['fraud_status'] ?? null;
 
             if ($status) {
-                $this->applyMidtransStatus($transaksi->fresh('details'), $payload, $status, $fraud);
+                $this->applyMidtransStatus($transaksi->fresh('details', 'user'), $payload, $status, $fraud);
             }
         } catch (\Throwable $e) {
             Log::warning('Gagal sinkron status Midtrans', [
@@ -361,15 +406,10 @@ class TokoController extends Controller
         }
     }
 
-    protected function applyMidtransStatus(
-        TransaksiPembelian $transaksi,
-        array $payload,
-        string $status,
-        ?string $fraud = null
-    ): void {
+    protected function applyMidtransStatus(TransaksiPembelian $transaksi, array $payload, string $status, ?string $fraud = null): void
+    {
         if ($status === 'capture' || $status === 'settlement') {
-            $isPaid = $status === 'settlement'
-                || ($status === 'capture' && $fraud !== 'challenge');
+            $isPaid = $status === 'settlement' || ($status === 'capture' && $fraud !== 'challenge');
 
             if ($isPaid && $transaksi->status !== 'dibayar') {
                 $transaksi->status = 'dibayar';
@@ -382,8 +422,7 @@ class TokoController extends Controller
                             'id_obat' => $detail->id_obat,
                             'jumlah' => $detail->jumlah,
                             'tanggal_keluar' => now(),
-                            'deskripsi' => 'Penjualan toko online - ' . $transaksi->kode_transaksi
-                                . ' oleh ' . optional($transaksi->user)->name,
+                            'deskripsi' => 'Penjualan toko online - ' . $transaksi->kode_transaksi . ' oleh ' . optional($transaksi->user)->name,
                         ]
                     );
 
@@ -392,21 +431,24 @@ class TokoController extends Controller
                         $obat->decrement('stok', $detail->jumlah);
                     }
                 }
-            } elseif (! $isPaid) {
+            }
+
+            if (! $isPaid) {
                 $transaksi->status = 'pending';
             }
         } elseif (in_array($status, ['cancel', 'deny', 'expire'], true)) {
             if ($transaksi->status === 'dibayar') {
                 foreach ($transaksi->details as $detail) {
                     Obat::where('id', $detail->id_obat)->increment('stok', $detail->jumlah);
-                    BarangKeluar::where(
-                        'kode',
-                        'PJ-' . $transaksi->kode_transaksi . '-' . $detail->id_obat
-                    )->delete();
+                    BarangKeluar::where('kode', 'PJ-' . $transaksi->kode_transaksi . '-' . $detail->id_obat)->delete();
                 }
             }
 
-            $transaksi->status = $status === 'expire' ? 'expired' : 'dibatalkan';
+            if ($status === 'expire') {
+                $transaksi->status = 'expired';
+            } else {
+                $transaksi->status = 'dibatalkan';
+            }
         } elseif ($status === 'pending') {
             $transaksi->status = 'pending';
         }
@@ -425,10 +467,7 @@ class TokoController extends Controller
 
         $expectedSignature = hash(
             'sha512',
-            $payload['order_id']
-            . $payload['status_code']
-            . $payload['gross_amount']
-            . config('midtrans.server_key')
+            $payload['order_id'] . $payload['status_code'] . $payload['gross_amount'] . config('midtrans.server_key')
         );
 
         return hash_equals($expectedSignature, $payload['signature_key']);

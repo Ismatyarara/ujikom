@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class PenjualanController extends Controller
 {
-    /**
-     * Data penjualan otomatis dari transaksi user (kode PJ-).
-     * Staff hanya bisa edit & hapus untuk koreksi.
-     */
     public function index()
     {
         $penjualan = BarangKeluar::with('obat')
@@ -26,51 +22,68 @@ class PenjualanController extends Controller
 
     public function show(BarangKeluar $penjualan)
     {
-        abort_unless(str_starts_with($penjualan->kode, 'PJ-'), 404);
+        if (!str_starts_with($penjualan->kode, 'PJ-')) {
+            abort(404);
+        }
 
         $penjualan->load('obat');
+
         return view('staff.penjualan.show', compact('penjualan'));
     }
 
     public function edit(BarangKeluar $penjualan)
     {
-        abort_unless(str_starts_with($penjualan->kode, 'PJ-'), 404);
+        if (!str_starts_with($penjualan->kode, 'PJ-')) {
+            abort(404);
+        }
 
-        $obat = Obat::where('status', 1)->get();
+        $obat = Obat::where('status', 1)->orderBy('nama_obat')->get();
+
         return view('staff.penjualan.edit', compact('penjualan', 'obat'));
     }
 
     public function update(Request $request, BarangKeluar $penjualan)
     {
-        abort_unless(str_starts_with($penjualan->kode, 'PJ-'), 404);
+        if (!str_starts_with($penjualan->kode, 'PJ-')) {
+            abort(404);
+        }
 
-        $data = $request->validate([
-            'jumlah'         => 'required|integer|min:1',
+        $request->validate([
+            'jumlah' => 'required|integer|min:1',
             'tanggal_keluar' => 'required|date',
-            'deskripsi'      => 'nullable|string',
+            'deskripsi' => 'nullable|string',
         ]);
 
-        // ✅ Hitung stok efektif setelah rollback jumlah lama, SEBELUM transaction
         $obat = Obat::findOrFail($penjualan->id_obat);
-        $stokEfektif = $obat->stok + $penjualan->jumlah; // stok kalau entry lama dibatalkan
+        $stokTersedia = $obat->stok + $penjualan->jumlah;
 
-        if ($stokEfektif < $data['jumlah']) {
+        if ($request->jumlah > $stokTersedia) {
             return back()->withErrors([
-                'jumlah' => "Stok {$obat->nama_obat} tidak mencukupi. Stok tersedia: {$stokEfektif}"
+                'jumlah' => 'Stok ' . $obat->nama_obat . ' tidak mencukupi. Stok tersedia: ' . $stokTersedia,
             ])->withInput();
         }
 
-        DB::transaction(function () use ($data, $penjualan) {
-            // Kembalikan stok lama
-            Obat::where('id', $penjualan->id_obat)
-                ->increment('stok', $penjualan->jumlah);
+        DB::beginTransaction();
 
-            // Potong stok dengan jumlah baru
-            Obat::where('id', $penjualan->id_obat)
-                ->decrement('stok', $data['jumlah']);
+        try {
+            $obat->stok = $obat->stok + $penjualan->jumlah;
+            $obat->save();
 
-            $penjualan->update($data);
-        });
+            $obat->stok = $obat->stok - $request->jumlah;
+            $obat->save();
+
+            $penjualan->update([
+                'jumlah' => $request->jumlah,
+                'tanggal_keluar' => $request->tanggal_keluar,
+                'deskripsi' => $request->deskripsi,
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Data penjualan gagal diupdate.')->withInput();
+        }
 
         return redirect()->route('staff.penjualan.index')
             ->with('success', 'Data penjualan berhasil diperbarui dan stok dikoreksi.');
@@ -78,15 +91,25 @@ class PenjualanController extends Controller
 
     public function destroy(BarangKeluar $penjualan)
     {
-        abort_unless(str_starts_with($penjualan->kode, 'PJ-'), 404);
+        if (!str_starts_with($penjualan->kode, 'PJ-')) {
+            abort(404);
+        }
 
-        DB::transaction(function () use ($penjualan) {
-            // Kembalikan stok saat penjualan dihapus/dibatalkan
-            Obat::where('id', $penjualan->id_obat)
-                ->increment('stok', $penjualan->jumlah);
+        DB::beginTransaction();
+
+        try {
+            $obat = Obat::findOrFail($penjualan->id_obat);
+            $obat->stok = $obat->stok + $penjualan->jumlah;
+            $obat->save();
 
             $penjualan->delete();
-        });
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Data penjualan gagal dihapus.');
+        }
 
         return redirect()->route('staff.penjualan.index')
             ->with('success', 'Data penjualan berhasil dihapus dan stok dikembalikan.');

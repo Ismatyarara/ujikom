@@ -12,7 +12,6 @@
       <td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
 
-          {{-- Header --}}
           <tr>
             <td style="background:#0C1D3B;padding:28px 32px;text-align:center;">
               <span style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-.5px;">
@@ -21,18 +20,16 @@
             </td>
           </tr>
 
-          {{-- Body --}}
           <tr>
             <td style="padding:36px 32px;">
 
               <p style="margin:0 0 8px 0;font-size:18px;font-weight:700;color:#0C1D3B;">
-                Verifikasi Akun Kamu 🔐
+                Verifikasi Akun Kamu
               </p>
               <p style="margin:0 0 24px 0;font-size:14px;color:#64748B;line-height:1.6;">
                 Gunakan kode OTP berikut untuk menyelesaikan verifikasi akun HealTack kamu.
               </p>
 
-              {{-- OTP Code --}}
               <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
                 <tr>
                   <td align="center">
@@ -45,13 +42,12 @@
                 </tr>
               </table>
 
-              {{-- Info --}}
               <table width="100%" cellpadding="0" cellspacing="0" style="background:#FFFBEB;border-radius:10px;margin:0 0 20px 0;">
                 <tr>
                   <td style="padding:14px 16px;">
                     <p style="margin:0;font-size:13px;color:#92400E;line-height:1.5;">
-                      ⏱ Kode ini berlaku selama <strong>10 menit</strong>.<br>
-                      🔒 Jangan bagikan kode ini kepada siapapun, termasuk tim HealTack.
+                      Kode ini berlaku selama <strong>10 menit</strong>.<br>
+                      Jangan bagikan kode ini kepada siapa pun, termasuk tim HealTack.
                     </p>
                   </td>
                 </tr>
@@ -64,11 +60,10 @@
             </td>
           </tr>
 
-          {{-- Footer --}}
           <tr>
             <td style="background:#F8FAFC;padding:20px 32px;text-align:center;border-top:1px solid #E2E8F0;">
               <p style="margin:0;font-size:12px;color:#94A3B8;">
-                © {{ date('Y') }} HealTack. All rights reserved.
+                &copy; {{ date('Y') }} HealTack. All rights reserved.
               </p>
             </td>
           </tr>

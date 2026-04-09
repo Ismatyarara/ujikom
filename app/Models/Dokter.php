@@ -22,7 +22,7 @@ class Dokter extends Model
         'tempat_praktik',
     ];
 
-    protected $appends = ['foto_url'];
+    protected $appends = ['foto_url', 'inisial_nama'];
 
     public function pengguna()
     {
@@ -38,6 +38,25 @@ class Dokter extends Model
     {
         return $this->foto
             ? asset('storage/' . $this->foto)
-            : asset('assets/images/faces/face1.jpg');
+            : null;
+    }
+
+    public function getInisialNamaAttribute()
+    {
+        $nama = trim((string) $this->nama);
+
+        if ($nama === '') {
+            return 'DR';
+        }
+
+        $bagianNama = preg_split('/\s+/', $nama, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $inisial = collect($bagianNama)
+            ->take(2)
+            ->map(function ($item) {
+                return strtoupper(substr($item, 0, 1));
+            })
+            ->implode('');
+
+        return $inisial !== '' ? $inisial : 'DR';
     }
 }

@@ -39,7 +39,7 @@ class CatatanMedisController extends Controller
             );
         }
 
-        $catatan      = $query->get();
+        $catatan      = $query->paginate(10)->withQueryString();
         $pasienDicari = null;
 
         if ($request->filled('kode_pasien')) {

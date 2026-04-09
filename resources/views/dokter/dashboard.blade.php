@@ -193,7 +193,7 @@
                     </div>
                     <div class="doctor-info-row">
                         <span class="doctor-info-label">Spesialisasi</span>
-                        <span class="doctor-info-value">{{ optional($dokter?->spesialisasi)->nama ?? '-' }}</span>
+                        <span class="doctor-info-value">{{ optional($dokter?->spesialisasi)->name ?? '-' }}</span>
                     </div>
                     <div class="doctor-info-row">
                         <span class="doctor-info-label">Catatan Medis Dibuat</span>

@@ -10,7 +10,7 @@
             </a>
         </li>
 
-        <li class="nav-item {{ request()->routeIs('staff.pembelian.*') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('staff.pembelian.index', 'staff.pembelian.show') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.pembelian.index') }}">
                 <i class="fas fa-receipt menu-icon"></i>
                 <span class="menu-title">Pesanan User</span>
@@ -18,7 +18,7 @@
         </li>
 
         <!-- Barang Masuk -->
-        <li class="nav-item {{ request()->routeIs('staff.barang-masuk.*') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('staff.barang-masuk.index', 'staff.barang-masuk.create', 'staff.barang-masuk.store', 'staff.barang-masuk.show', 'staff.barang-masuk.edit', 'staff.barang-masuk.update', 'staff.barang-masuk.destroy') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.barang-masuk.index') }}">
                 <i class="fas fa-truck-loading menu-icon"></i>
                 <span class="menu-title">Barang Masuk</span>
@@ -26,7 +26,7 @@
         </li>
 
         <!-- Barang Keluar -->
-        <li class="nav-item {{ request()->routeIs('staff.barang-keluar.*') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('staff.barang-keluar.index', 'staff.barang-keluar.create', 'staff.barang-keluar.store', 'staff.barang-keluar.show', 'staff.barang-keluar.edit', 'staff.barang-keluar.update', 'staff.barang-keluar.destroy') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.barang-keluar.index') }}">
                 <i class="fas fa-box-open menu-icon"></i>
                 <span class="menu-title">Barang Keluar</span>
@@ -34,10 +34,10 @@
         </li>
 
         <!-- Obat -->
-        <li class="nav-item {{ request()->routeIs('staff.obat.*') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('staff.obat.index', 'staff.obat.create', 'staff.obat.store', 'staff.obat.show', 'staff.obat.edit', 'staff.obat.update', 'staff.obat.destroy') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('staff.obat.index') }}">
                 <i class="fas fa-pills menu-icon"></i>
-                <span class="menu-title">Mengelolah Obat</span>
+                <span class="menu-title">Mengelola Obat</span>
             </a>
         </li>
 

@@ -44,10 +44,10 @@
                         <tr>
                             <th>Status</th>
                             <td>
-                                @if($obat->status === 'aktif')
-                                    <span class="badge bg-success">Aktif</span>
-                                @else
-                                    <span class="badge bg-secondary">Nonaktif</span>
+                        @if($obat->is_aktif)
+                            <span class="badge bg-success">Aktif</span>
+                        @else
+                            <span class="badge bg-secondary">Nonaktif</span>
                                 @endif
                             </td>
                         </tr>

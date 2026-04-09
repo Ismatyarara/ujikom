@@ -26,9 +26,9 @@
                                      style="max-width: 200px; width: 100%;" 
                                      alt="Foto Profile">
                             @else
-                                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" 
+                                <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center fw-bold" 
                                      style="width: 200px; height: 200px; margin: 0 auto;">
-                                    <i class="icon-user" style="font-size: 5rem;"></i>
+                                    <span style="font-size: 4rem; letter-spacing: 2px;">{{ Auth::user()->initials }}</span>
                                 </div>
                                 <small class="text-muted mt-2 d-block">Belum ada foto</small>
                             @endif

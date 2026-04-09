@@ -1,4 +1,3 @@
-{{-- ====================== edit.blade.php ====================== --}}
 @extends('layouts.app')
 
 @section('title', 'Edit Barang Keluar')
@@ -35,21 +34,44 @@
             <label for="id_obat" class="form-label fw-semibold">
               Obat <span class="text-danger">*</span>
             </label>
+            <input type="text" id="obat_search" class="form-control mb-2"
+                   placeholder="Cari nama obat atau kode obat">
             <select name="id_obat" id="id_obat"
-                    class="form-select @error('id_obat') is-invalid @enderror">
+                    class="form-select @error('id_obat') is-invalid @enderror"
+                    onchange="updateSelectedObatInfo(this)">
               <option value="">-- Pilih Obat --</option>
               @foreach($obat as $item)
                 <option value="{{ $item->id }}"
                   data-stok="{{ $item->stok }}"
                   data-satuan="{{ $item->satuan }}"
+                  data-kode="{{ $item->kode_obat }}"
+                  data-nama="{{ $item->nama_obat }}"
                   {{ old('id_obat', $barangKeluar->id_obat) == $item->id ? 'selected' : '' }}>
-                  {{ $item->nama_obat }} ({{ $item->kode_obat }}) — Stok: {{ $item->stok }} {{ $item->satuan }}
+                  {{ $item->nama_obat }} ({{ $item->kode_obat }}) - Stok: {{ $item->stok }} {{ $item->satuan }}
                 </option>
               @endforeach
             </select>
             @error('id_obat')
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror
+            <div class="form-text">Ketik beberapa huruf untuk mempercepat pencarian obat.</div>
+
+            <div id="selected-obat-info" class="alert alert-light border mt-3 d-none">
+              <div class="row">
+                <div class="col-md-5 mb-2 mb-md-0">
+                  <small class="text-muted d-block">Nama Obat</small>
+                  <strong id="selected-obat-nama">-</strong>
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                  <small class="text-muted d-block">Kode</small>
+                  <strong id="selected-obat-kode">-</strong>
+                </div>
+                <div class="col-md-4">
+                  <small class="text-muted d-block">Stok Saat Ini</small>
+                  <strong id="stok-value">-</strong> <span id="stok-satuan"></span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="mb-3">
@@ -102,3 +124,78 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function updateSelectedObatInfo(select) {
+  const option = select.options[select.selectedIndex];
+  const infoBox = document.getElementById('selected-obat-info');
+  const stokValue = document.getElementById('stok-value');
+  const stokSatuan = document.getElementById('stok-satuan');
+  const obatNama = document.getElementById('selected-obat-nama');
+  const obatKode = document.getElementById('selected-obat-kode');
+
+  if (option && option.value) {
+    stokValue.textContent = option.dataset.stok;
+    stokSatuan.textContent = option.dataset.satuan;
+    obatNama.textContent = option.dataset.nama;
+    obatKode.textContent = option.dataset.kode;
+    infoBox.classList.remove('d-none');
+    infoBox.className = 'alert border mt-3 ' + (parseInt(option.dataset.stok, 10) <= 10 ? 'alert-warning' : 'alert-light');
+  } else {
+    infoBox.classList.add('d-none');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('obat_search');
+  const select = document.getElementById('id_obat');
+  const originalOptions = Array.from(select.options).map((option) => ({
+    value: option.value,
+    text: option.textContent,
+    dataset: { ...option.dataset },
+  }));
+
+  function renderOptions(keyword) {
+    const normalizedKeyword = keyword.trim().toLowerCase();
+    const currentValue = select.value;
+
+    select.innerHTML = '';
+
+    originalOptions.forEach((item, index) => {
+      const haystack = `${item.text} ${item.dataset.nama || ''} ${item.dataset.kode || ''}`.toLowerCase();
+      if (index !== 0 && normalizedKeyword && !haystack.includes(normalizedKeyword)) {
+        return;
+      }
+
+      const option = document.createElement('option');
+      option.value = item.value;
+      option.textContent = item.text;
+
+      Object.entries(item.dataset).forEach(([key, value]) => {
+        option.dataset[key] = value;
+      });
+
+      if (item.value === currentValue) {
+        option.selected = true;
+      }
+
+      select.appendChild(option);
+    });
+
+    if (!select.querySelector(`option[value="${currentValue}"]`)) {
+      select.selectedIndex = 0;
+    }
+
+    updateSelectedObatInfo(select);
+  }
+
+  searchInput.addEventListener('input', function () {
+    renderOptions(this.value);
+  });
+
+  renderOptions(searchInput.value);
+  updateSelectedObatInfo(select);
+});
+</script>
+@endpush

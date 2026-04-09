@@ -71,7 +71,13 @@
       @auth
         <li class="nav-item nav-profile dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-            <img src="{{ auth()->user()->avatar ?? asset('assets/images/faces/face28.jpg') }}" alt="profile"/>
+            @if(auth()->user()->avatar)
+              <img src="{{ auth()->user()->avatar }}" alt="profile"/>
+            @else
+              <span style="width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e0e7ff;color:#3730a3;font-weight:700;">
+                {{ auth()->user()->initials }}
+              </span>
+            @endif
           </a>
 
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown">

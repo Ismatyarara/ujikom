@@ -51,6 +51,7 @@
                              font-size: 16px; flex-shrink: 0; }
     .catatan-banner .info { font-size: 13px; color: var(--blue-900); }
     .catatan-banner .info strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .catatan-meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 10px; color: var(--gray-500); font-size: 12px; }
 
     .sec-title { font-size: 13px; font-weight: 700; color: var(--blue-900); text-transform: uppercase;
                  letter-spacing: .05em; margin: 24px 0 14px; display: flex; align-items: center; gap: 8px; }

@@ -38,18 +38,18 @@
                 @php
                     $user = Auth::user();
                     $isProfileComplete =
-                        $user->profile && empty($user->profile->phone) && empty($user->profile->address);
+                        $user->profile && !empty($user->profile->no_hp) && !empty($user->profile->alamat);
                 @endphp
 
                 @if ($isProfileComplete)
-                    <li class="nav-item {{ request()->routeIs('user.konsultasi*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('user.konsultasi.index', 'user.konsultasi.create', 'user.konsultasi.store', 'user.konsultasi.show', 'user.konsultasi.edit', 'user.konsultasi.update', 'user.konsultasi.destroy') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.konsultasi.index') }}">
                             <i class="fas fa-comment-medical menu-icon"></i>
                             <span class="menu-title">Konsultasi</span>
                         </a>
                     </li>
 
-                    <li class="nav-item {{ request()->routeIs('user.catatan*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('user.catatan.index', 'user.catatan.create', 'user.catatan.store', 'user.catatan.show', 'user.catatan.edit', 'user.catatan.update', 'user.catatan.destroy') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.catatan.index') }}">
                             <i class="fas fa-file-medical-alt menu-icon"></i>
                             <span class="menu-title">Catatan Medis</span>
@@ -57,21 +57,21 @@
                     </li>
 
 
-                    <li class="nav-item {{ request()->routeIs('user.jadwal*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('user.jadwal.index', 'user.jadwal.show') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.jadwal.index') }}">
                             <i class="icon-clock menu-icon"></i>
                             <span class="menu-title">Jadwal Obat</span>
                         </a>
                     </li>
 
-                    <li class="nav-item {{ request()->routeIs('toko*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('toko.index', 'toko.show', 'toko.keranjang', 'toko.tambahKeranjang', 'toko.updateKeranjang', 'toko.hapusKeranjang', 'toko.beliSekarang', 'toko.checkout', 'toko.prosesCheckout', 'toko.pembayaran', 'toko.riwayat') ? 'active' : '' }}">
                         <a class="nav-link" data-toggle="collapse" href="#toko"
-                            aria-expanded="{{ request()->routeIs('toko*') ? 'true' : 'false' }}" aria-controls="toko">
+                            aria-expanded="{{ request()->routeIs('toko.index', 'toko.show', 'toko.keranjang', 'toko.tambahKeranjang', 'toko.updateKeranjang', 'toko.hapusKeranjang', 'toko.beliSekarang', 'toko.checkout', 'toko.prosesCheckout', 'toko.pembayaran', 'toko.riwayat') ? 'true' : 'false' }}" aria-controls="toko">
                             <i class="fas fa-store menu-icon"></i>
                             <span class="menu-title">Toko Obat</span>
                             <i class="menu-arrow"></i>
                         </a>
-                        <div class="collapse {{ request()->routeIs('toko*') ? 'show' : '' }}" id="toko">
+                        <div class="collapse {{ request()->routeIs('toko.index', 'toko.show', 'toko.keranjang', 'toko.tambahKeranjang', 'toko.updateKeranjang', 'toko.hapusKeranjang', 'toko.beliSekarang', 'toko.checkout', 'toko.prosesCheckout', 'toko.pembayaran', 'toko.riwayat') ? 'show' : '' }}" id="toko">
                             <ul class="nav flex-column sub-menu">
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('toko.index') ? 'active' : '' }}"

@@ -66,10 +66,16 @@
                             {{-- Foto Dokter --}}
                             <div class="col-auto">
                                 <div class="position-relative">
-                                    <img src="{{ $dokter->foto_url }}"
-                                         alt="{{ $dokter->nama }}"
-                                         class="rounded-3 shadow-sm"
-                                         style="width: 90px; height: 110px; object-fit: cover;">
+                                    @if($dokter->foto_url)
+                                        <img src="{{ $dokter->foto_url }}"
+                                             alt="{{ $dokter->nama }}"
+                                             class="rounded-3 shadow-sm"
+                                             style="width: 90px; height: 110px; object-fit: cover;">
+                                    @else
+                                        <div class="dokter-inisial shadow-sm">
+                                            {{ $dokter->inisial_nama }}
+                                        </div>
+                                    @endif
                                     <span class="position-absolute bottom-0 end-0 translate-middle badge rounded-pill bg-success shadow-sm">
                                         <i class="bi bi-check-lg"></i>
                                     </span>
@@ -220,6 +226,20 @@
 
     .rounded-3 {
         border-radius: 0.75rem !important;
+    }
+
+    .dokter-inisial {
+        width: 90px;
+        height: 110px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: #ffffff;
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
     }
 </style>
 @endpush

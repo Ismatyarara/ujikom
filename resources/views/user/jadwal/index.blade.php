@@ -21,6 +21,18 @@
     color: #64748b;
     margin-top: 4px;
 }
+.account-note {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -107,12 +119,21 @@
     border-radius: 14px;
 }
 .empty i { font-size: 40px; color: #dbeafe; margin-bottom: 10px; display: block; }
+.empty small {
+    display: block;
+    margin-top: 8px;
+    color: #94a3b8;
+}
 </style>
 
 <div class="wrap">
     <div class="top">
         <h2>Jadwal Obat Saya</h2>
         <p>Daftar jadwal konsumsi obat yang diberikan dokter</p>
+        <div class="account-note">
+            <i class="fa-solid fa-user"></i>
+            Akun aktif: {{ $currentUser->name }} ({{ $currentUser->email }})
+        </div>
     </div>
 
     @if($jadwals->count())
@@ -159,6 +180,7 @@
     <div class="empty">
         <i class="fa-solid fa-pills"></i>
         <p>Belum ada jadwal obat dari dokter.</p>
+        <small>Pastikan jadwal dibuat untuk akun yang sedang login ini.</small>
     </div>
     @endif
 </div>

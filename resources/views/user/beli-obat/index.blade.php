@@ -272,6 +272,12 @@
         justify-content: center;
         gap: 4px;
     }
+    .btn-obat.is-loading,
+    .btn-obat:disabled {
+        opacity: .65;
+        cursor: wait;
+        pointer-events: none;
+    }
     .btn-obat:active { transform: scale(.97); }
     .btn-obat.outline {
         background: #f0f3ff;
@@ -405,7 +411,7 @@
                         {{-- Actions --}}
                         <div class="obat-actions">
                             <form action="{{ route('toko.tambahKeranjang') }}" method="POST"
-                                  onsubmit="syncJumlah({{ $item->id }}, this)">
+                                  onsubmit="return handleObatSubmit({{ $item->id }}, this)">
                                 @csrf
                                 <input type="hidden" name="id_obat" value="{{ $item->id }}">
                                 <input type="hidden" name="jumlah" class="jumlah-hidden">
@@ -415,7 +421,7 @@
                             </form>
 
                             <form action="{{ route('toko.beliSekarang') }}" method="POST"
-                                  onsubmit="syncJumlah({{ $item->id }}, this)">
+                                  onsubmit="return handleObatSubmit({{ $item->id }}, this)">
                                 @csrf
                                 <input type="hidden" name="id_obat" value="{{ $item->id }}">
                                 <input type="hidden" name="jumlah" class="jumlah-hidden">
@@ -447,9 +453,23 @@
 </div>
 
 <script>
-    function syncJumlah(id, form) {
-        const jumlah = document.getElementById('jumlah-' + id).value;
-        form.querySelector('.jumlah-hidden').value = jumlah;
+    function handleObatSubmit(id, form) {
+        const input = document.getElementById('jumlah-' + id);
+        const jumlah = parseInt(input.value || 1, 10);
+        const min = parseInt(input.min || 1, 10);
+        const max = parseInt(input.max || jumlah, 10);
+        const finalJumlah = Math.min(Math.max(jumlah, min), max);
+
+        input.value = finalJumlah;
+        form.querySelector('.jumlah-hidden').value = finalJumlah;
+
+        const button = form.querySelector('button[type="submit"]');
+        if (button) {
+            button.disabled = true;
+            button.classList.add('is-loading');
+        }
+
+        return true;
     }
 
     function changeQty(id, delta, max) {

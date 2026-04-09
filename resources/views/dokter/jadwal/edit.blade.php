@@ -28,6 +28,15 @@
 .form-group{
     margin-bottom:15px;
 }
+.static-field{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #dbeafe;
+    border-radius:8px;
+    font-size:14px;
+    background:#f8fbff;
+    color:#334155;
+}
 label{
     font-size:13px;
     font-weight:600;
@@ -101,26 +110,12 @@ input:focus, select:focus, textarea:focus{
 
             <div class="form-group">
                 <label>Pasien</label>
-                <select name="user_id" required>
-                    @foreach($pasien as $p)
-                    <option value="{{ $p->id }}"
-                        {{ $jadwal->user_id == $p->id ? 'selected' : '' }}>
-                        {{ $p->name }}
-                    </option>
-                    @endforeach
-                </select>
+                <div class="static-field">{{ $jadwal->user->name ?? '-' }}</div>
             </div>
 
             <div class="form-group">
                 <label>Dokter</label>
-                <select name="dokter_id" required>
-                    @foreach($dokters as $d)
-                    <option value="{{ $d->id }}"
-                        {{ $jadwal->dokter_id == $d->id ? 'selected' : '' }}>
-                        {{ $d->nama }}
-                    </option>
-                    @endforeach
-                </select>
+                <div class="static-field">{{ $jadwal->dokter->nama ?? '-' }}</div>
             </div>
 
             <div class="form-group">
@@ -138,13 +133,13 @@ input:focus, select:focus, textarea:focus{
             <div class="form-group">
                 <label>Tanggal Mulai</label>
                 <input type="date" name="tanggal_mulai"
-                       value="{{ $jadwal->tanggal_mulai }}" required>
+                       value="{{ optional($jadwal->tanggal_mulai)->format('Y-m-d') }}" required>
             </div>
 
             <div class="form-group">
                 <label>Tanggal Selesai</label>
                 <input type="date" name="tanggal_selesai"
-                       value="{{ $jadwal->tanggal_selesai }}" required>
+                       value="{{ optional($jadwal->tanggal_selesai)->format('Y-m-d') }}" required>
             </div>
 
             <div class="form-group">

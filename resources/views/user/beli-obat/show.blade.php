@@ -190,6 +190,12 @@
         border-left: 1.5px solid #e8eaf2;
     }
 
+    .btn-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
     .btn-add-cart {
         background: #4f6ef7;
         color: #fff;
@@ -207,9 +213,18 @@
         width: 100%;
         justify-content: center;
     }
+    .btn-add-cart.secondary {
+        background: #eef2ff;
+        color: #4f6ef7;
+    }
     .btn-add-cart:hover { opacity: .87; }
     .btn-add-cart:active { transform: scale(.98); }
     .btn-add-cart i { font-size: .8rem; }
+    .btn-add-cart:disabled {
+        opacity: .65;
+        cursor: wait;
+        pointer-events: none;
+    }
 </style>
 
 <div class="detail-wrap">
@@ -269,7 +284,7 @@
                 {{-- Form --}}
                 <div class="action-section">
                     <form action="{{ route('toko.tambahKeranjang') }}" method="POST"
-                          onsubmit="syncQty(this)">
+                          onsubmit="return submitObatDetail(this)">
                         @csrf
                         <input type="hidden" name="id_obat" value="{{ $obat->id }}">
                         <input type="hidden" name="jumlah" class="jumlah-hidden">
@@ -285,9 +300,20 @@
                                     onclick="stepQty(1, {{ $obat->stok }})">+</button>
                         </div>
 
-                        <button type="submit" class="btn-add-cart">
-                            <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
-                        </button>
+                        <div class="btn-actions">
+                            <button type="submit" class="btn-add-cart secondary">
+                                <i class="fas fa-cart-plus"></i> Keranjang
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn-add-cart"
+                                formaction="{{ route('toko.beliSekarang') }}"
+                                data-loading-text="Memproses..."
+                            >
+                                <i class="fas fa-bolt"></i> Beli Sekarang
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -305,9 +331,27 @@
         input.value = val;
     }
 
-    function syncQty(form) {
-        const qty = document.getElementById('qty-detail').value;
-        form.querySelector('.jumlah-hidden').value = qty;
+    function submitObatDetail(form) {
+        const input = document.getElementById('qty-detail');
+        const qty = parseInt(input.value || 1, 10);
+        const min = parseInt(input.min || 1, 10);
+        const max = parseInt(input.max || qty, 10);
+        const finalQty = Math.min(Math.max(qty, min), max);
+
+        input.value = finalQty;
+        form.querySelector('.jumlah-hidden').value = finalQty;
+
+        const submitter = document.activeElement;
+        const buttons = form.querySelectorAll('button[type="submit"]');
+        buttons.forEach((button) => {
+            button.disabled = true;
+        });
+
+        if (submitter && submitter.tagName === 'BUTTON') {
+            submitter.textContent = submitter.dataset.loadingText || 'Memproses...';
+        }
+
+        return true;
     }
 </script>
 

@@ -207,6 +207,11 @@
     }
     .btn-bayar:hover { opacity: .87; }
     .btn-bayar i { font-size: .8rem; }
+    .btn-bayar:disabled {
+        opacity: .65;
+        cursor: wait;
+        pointer-events: none;
+    }
 </style>
 
 <div class="checkout-wrap">
@@ -318,5 +323,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('form-checkout')?.addEventListener('submit', function () {
+        const submitButton = document.querySelector('.btn-bayar');
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+        }
+    });
+</script>
 
 @endsection

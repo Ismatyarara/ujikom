@@ -15,7 +15,9 @@ class DokterDashboardController extends Controller
     public function index()
     {
         $dokterUser = Auth::user();
-        $dokter = Dokter::where('user_id', $dokterUser->id)->first();
+        $dokter = Dokter::with('spesialisasi')
+            ->where('user_id', $dokterUser->id)
+            ->first();
 
         // Total pasien unik yang pernah chat dengan dokter ini
         $totalPasien = DB::table('ch_messages')

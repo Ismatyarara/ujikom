@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class SpesialisasiController extends Controller
 {
-   public function index()
-{
-    $spesialisasis = Spesialisasi::withCount('dokter')->paginate(10);
+    public function index()
+    {
+        $spesialisasis = Spesialisasi::withCount('dokter')->paginate(10);
 
-    return view('admin.spesialisasi.index', compact('spesialisasis'));
-}
+        return view('admin.spesialisasi.index', compact('spesialisasis'));
+    }
 
     public function create()
     {
@@ -29,8 +29,7 @@ class SpesialisasiController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')
-                ->store('spesialisasi', 'public');
+            $data['foto'] = $request->file('foto')->store('spesialisasi', 'public');
         }
 
         Spesialisasi::create($data);
@@ -41,8 +40,8 @@ class SpesialisasiController extends Controller
 
     public function show(Spesialisasi $spesialisasi)
     {
-        $spesialisasi->loadCount('dokter')
-                     ->load('dokter.pengguna');
+        $spesialisasi->loadCount('dokter');
+        $spesialisasi->load('dokter.pengguna');
 
         return view('admin.spesialisasi.show', compact('spesialisasi'));
     }
@@ -52,31 +51,26 @@ class SpesialisasiController extends Controller
         return view('admin.spesialisasi.edit', compact('spesialisasi'));
     }
 
-     public function update(Request $request, Spesialisasi $spesialisasi)
-{
-    $data = $request->validate([
-        'name' => 'required|string|max:255|unique:spesialisasi,name,' . $spesialisasi->id,
-        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
+    public function update(Request $request, Spesialisasi $spesialisasi)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255|unique:spesialisasi,name,' . $spesialisasi->id,
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    if ($request->hasFile('foto')) {
+        if ($request->hasFile('foto')) {
+            if ($spesialisasi->foto) {
+                Storage::disk('public')->delete($spesialisasi->foto);
+            }
 
-        // hapus foto lama
-        if ($spesialisasi->foto) {
-            Storage::disk('public')->delete($spesialisasi->foto);
+            $data['foto'] = $request->file('foto')->store('spesialisasi', 'public');
         }
 
-        // simpan foto baru
-        $data['foto'] = $request->file('foto')
-                                 ->store('spesialisasi', 'public');
+        $spesialisasi->update($data);
+
+        return redirect()->route('admin.spesialisasi.index')
+            ->with('success', 'Spesialisasi berhasil diupdate');
     }
-
-    $spesialisasi->update($data);
-
-    return redirect()->route('admin.spesialisasi.index')
-        ->with('success', 'Spesialisasi berhasil diupdate');
-}
-
 
     public function destroy(Spesialisasi $spesialisasi)
     {

@@ -18,6 +18,16 @@
         border-radius: 50%;
         border: 3px solid #e9ecef;
     }
+    .avatar-fallback {
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #2563eb;
+        color: #fff;
+        font-weight: 700;
+        font-size: 2rem;
+    }
     .info-row {
         padding: 10px 0;
         border-bottom: 1px solid #f1f1f1;
@@ -51,8 +61,14 @@
     <div class="col-md-4 mb-4 mb-md-0">
         <div class="card dash-card h-100">
             <div class="card-body text-center py-4">
-                <img src="{{ $profile && $profile->foto ? asset('storage/'.$profile->foto) : asset('assets/images/faces/face1.jpg') }}"
-                     class="avatar mb-3">
+                        @if($profile && $profile->foto)
+                            <img src="{{ asset('storage/'.$profile->foto) }}"
+                                 class="avatar mb-3">
+                        @else
+                            <div class="avatar avatar-fallback">
+                                {{ Auth::user()->initials }}
+                            </div>
+                        @endif
 
                 <h5 class="mb-1">{{ $profile->nama_panjang ?? '-' }}</h5>
                 <small class="text-muted d-block mb-2">{{ Auth::user()->email }}</small>

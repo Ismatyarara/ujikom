@@ -56,6 +56,8 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::get('obat/pembelian', [ObatController::class, 'pembelian'])
             ->name('obat.pembelian');
+        Route::get('obat/pembelian/{pembelian}', [ObatController::class, 'showPembelian'])
+            ->name('obat.pembelian.show');
 
         Route::resource('obat', ObatController::class);
         Route::resource('staff', App\Http\Controllers\Admin\StaffController::class);

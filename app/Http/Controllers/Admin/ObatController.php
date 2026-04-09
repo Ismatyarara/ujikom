@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Obat;
+use App\Models\TransaksiPembelian;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ObatController extends Controller
 {
@@ -15,10 +15,31 @@ class ObatController extends Controller
         return view('admin.obat.index', compact('obat'));
     }
 
-    public function pembelian()
+    public function pembelian(Request $request)
     {
-        $pembelian = Obat::paginate(10);
+        $search = $request->string('search')->toString();
+
+        $pembelian = TransaksiPembelian::with(['user', 'details.obat'])
+            ->when($search, function ($query, $search) {
+                $query->where('kode_transaksi', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return view('admin.obat.pembelian', compact('pembelian'));
+    }
+
+    public function showPembelian(TransaksiPembelian $pembelian)
+    {
+        $pembelian->load(['user', 'details.obat']);
+
+        return view('admin.obat.pembelian-show', compact('pembelian'));
     }
 
     public function show($id)

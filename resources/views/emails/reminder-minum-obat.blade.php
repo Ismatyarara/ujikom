@@ -1,5 +1,5 @@
 @component('mail::message')
-# Halo, {{ $pasien->name }}! 👋
+# Halo, {{ $pasien->name }}!
 
 Ini adalah pengingat bahwa sudah waktunya kamu minum obat.
 
@@ -9,7 +9,7 @@ Ini adalah pengingat bahwa sudah waktunya kamu minum obat.
 **Catatan:** {{ $jadwal->deskripsi ?? '-' }}
 @endcomponent
 
-Jaga kesehatanmu dan minum obat tepat waktu ya! 💊
+Jaga kesehatanmu dan minum obat tepat waktu ya.
 
 Salam,
 {{ config('app.name') }}

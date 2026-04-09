@@ -26,6 +26,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'initials',
+        'display_name',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -74,6 +79,28 @@ class User extends Authenticatable
     public function isAktif(): bool
     {
         return $this->status === 'aktif';
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->profile->nama_panjang ?? $this->name;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $name = trim((string) ($this->profile->nama_panjang ?? $this->name));
+
+        if ($name === '') {
+            return 'U';
+        }
+
+        $parts = preg_split('/\s+/', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $initials = collect($parts)
+            ->take(2)
+            ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+            ->implode('');
+
+        return $initials !== '' ? $initials : 'U';
     }
 
 

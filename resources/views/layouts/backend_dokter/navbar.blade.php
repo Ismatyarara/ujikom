@@ -46,10 +46,16 @@
             <p class="dropdown-header">Pesan Baru</p>
 
             @forelse($recentMessages as $msg)
-              <a class="dropdown-item preview-item" href="{{ url('chatify/' . $msg->from_id) }}">
+              <a class="dropdown-item preview-item" href="{{ route('user', ['id' => $msg->from_id]) }}">
                 <div class="preview-thumbnail">
-                  <img src="{{ $msg->sender?->avatar ?? asset('assets/images/faces/face1.jpg') }}"
-                       class="rounded-circle" width="40" height="40">
+                  @if($msg->sender?->avatar)
+                    <img src="{{ $msg->sender->avatar }}" class="rounded-circle" width="40" height="40">
+                  @else
+                    <span class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                          style="width:40px;height:40px;background:#e0e7ff;color:#3730a3;font-weight:700;">
+                      {{ $msg->sender?->initials ?? 'U' }}
+                    </span>
+                  @endif
                 </div>
                 <div class="preview-item-content">
                   <h6 class="preview-subject">{{ $msg->sender?->name ?? 'Unknown' }}</h6>
@@ -61,7 +67,7 @@
             @endforelse
 
             @if($unread > 0)
-              <a class="dropdown-item text-center" href="{{ url('chatify') }}">Lihat Semua Pesan</a>
+              <a class="dropdown-item text-center" href="{{ route(config('chatify.routes.prefix')) }}">Lihat Semua Pesan</a>
             @endif
           </div>
         </li>
@@ -87,7 +93,7 @@
               <p class="text-primary mb-0"><small>Dokter</small></p>
             </div>
 
-            <a class="dropdown-item" href="{{ url('chatify') }}">
+            <a class="dropdown-item" href="{{ route(config('chatify.routes.prefix')) }}">
               <i class="ti-comment text-primary"></i> Pesan Konsultasi
             </a>
 

@@ -3,10 +3,61 @@
 @section('title', 'Dashboard Staff')
 
 @section('content')
+<style>
+  .staff-hero {
+    margin-bottom: 20px;
+  }
+  .staff-hero-title {
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 6px;
+  }
+  .staff-card {
+    border: 1px solid #edf1f7;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  }
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .quick-link {
+    display: block;
+    padding: 16px 18px;
+    border: 1px solid #dbe7f5;
+    border-radius: 16px;
+    text-decoration: none;
+    background: #f8fbff;
+    transition: 0.2s ease;
+  }
+  .quick-link:hover {
+    text-decoration: none;
+    transform: translateY(-2px);
+    border-color: #93c5fd;
+  }
+  .quick-link strong {
+    display: block;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+  .quick-link span {
+    color: #6b7280;
+    font-size: 0.84rem;
+  }
+</style>
+
+<div class="row">
+  <div class="col-12 staff-hero">
+    <h3 class="staff-hero-title">Selamat Datang, {{ auth()->user()->name }}!</h3>
+    <p class="text-muted">Pantau stok obat, transaksi, dan pesanan user dari satu dashboard.</p>
+  </div>
+</div>
+
 <!-- Statistics Cards -->
 <div class="row">
   <div class="col-md-3 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -22,7 +73,7 @@
   </div>
   
   <div class="col-md-3 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -38,7 +89,7 @@
   </div>
   
   <div class="col-md-3 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -55,7 +106,7 @@
   </div>
   
   <div class="col-md-3 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -74,7 +125,7 @@
 
 <div class="row">
   <div class="col-md-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -90,7 +141,7 @@
   </div>
 
   <div class="col-md-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -106,7 +157,7 @@
   </div>
 
   <div class="col-md-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -126,7 +177,7 @@
 <div class="row">
   <!-- Chart -->
   <div class="col-md-8 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <h4 class="card-title">Barang Masuk vs Keluar (6 Bulan Terakhir)</h4>
         <canvas id="barangChart"></canvas>
@@ -136,7 +187,7 @@
   
   <!-- Obat Terlaris -->
   <div class="col-md-4 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <h4 class="card-title">Obat Terlaris</h4>
         <div class="list-group list-group-flush">
@@ -160,7 +211,7 @@
 
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="card-title mb-0">Pesanan User Terbaru</h4>
@@ -204,10 +255,38 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card staff-card">
+      <div class="card-body">
+        <h4 class="card-title">Aksi Cepat</h4>
+        <div class="quick-grid">
+          <a href="{{ route('staff.obat.index') }}" class="quick-link">
+            <strong>Data Obat</strong>
+            <span>Lihat stok dan status obat.</span>
+          </a>
+          <a href="{{ route('staff.barang-masuk.index') }}" class="quick-link">
+            <strong>Barang Masuk</strong>
+            <span>Kelola obat yang baru datang.</span>
+          </a>
+          <a href="{{ route('staff.barang-keluar.index') }}" class="quick-link">
+            <strong>Barang Keluar</strong>
+            <span>Lihat obat yang sudah keluar.</span>
+          </a>
+          <a href="{{ route('staff.pembelian.index') }}" class="quick-link">
+            <strong>Pesanan User</strong>
+            <span>Periksa status pesanan pembelian.</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Transaksi Terakhir -->
 <div class="row">
   <div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
+    <div class="card staff-card">
       <div class="card-body">
         <h4 class="card-title">Transaksi Terakhir</h4>
         <div class="table-responsive">

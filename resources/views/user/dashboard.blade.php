@@ -47,9 +47,9 @@
     $badgeJenisKelamin = $jenisKelamin === 'L' ? 'info' : 'warning';
     $umur = $profile->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->age : null;
     $menus = [
-        ['color' => 'primary', 'title' => 'Konsultasi', 'desc' => 'Chat dengan dokter', 'url' => route(config('chatify.routes.prefix'))],
-        ['color' => 'success', 'title' => 'Lihat Obat', 'desc' => 'Informasi obat', 'url' => '#'],
-        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Atur jadwal minum', 'url' => '#'],
+        ['color' => 'primary', 'title' => 'Konsultasi', 'desc' => 'Pilih dokter dan mulai chat', 'url' => route('user.konsultasi.index')],
+        ['color' => 'success', 'title' => 'Lihat Obat', 'desc' => 'Lihat dan beli obat', 'url' => route('toko.index')],
+        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Lihat jadwal minum obat', 'url' => route('user.jadwal.index')],
         ['color' => 'info', 'title' => 'Profile', 'desc' => 'Kelola data diri', 'url' => route('user.profile.show')],
     ];
 @endphp

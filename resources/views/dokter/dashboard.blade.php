@@ -128,6 +128,35 @@
         font-size: 0.88rem;
         margin-bottom: 0;
     }
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+    .action-card {
+        display: block;
+        padding: 16px 18px;
+        border: 1px solid #dbe7f5;
+        border-radius: 16px;
+        text-decoration: none;
+        background: #f8fbff;
+        transition: 0.2s ease;
+    }
+    .action-card:hover {
+        border-color: #93c5fd;
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    .action-title {
+        color: #111827;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .action-copy {
+        color: #6b7280;
+        font-size: 0.82rem;
+        margin-bottom: 0;
+    }
 </style>
 
 <div class="doctor-wrap">
@@ -246,6 +275,30 @@
                         <p class="empty-copy">Belum ada catatan medis yang dibuat.</p>
                     @endforelse
                 </div>
+            </div>
+        </div>
+
+        <div class="panel-card mt-3">
+            <div class="panel-header">
+                <h5 class="panel-title">Aksi Cepat</h5>
+            </div>
+            <div class="action-grid">
+                <a href="{{ route('dokter.konsultasi.index') }}" class="action-card">
+                    <div class="action-title">Konsultasi</div>
+                    <p class="action-copy">Buka daftar chat pasien dan balas konsultasi.</p>
+                </a>
+                <a href="{{ route('dokter.catatan.index') }}" class="action-card">
+                    <div class="action-title">Catatan Medis</div>
+                    <p class="action-copy">Cari pasien lalu buat atau lihat catatan medis.</p>
+                </a>
+                <a href="{{ route('dokter.jadwal.index') }}" class="action-card">
+                    <div class="action-title">Jadwal Obat</div>
+                    <p class="action-copy">Kelola jadwal obat yang sedang aktif.</p>
+                </a>
+                <a href="{{ route('dokter.data-obat.index') }}" class="action-card">
+                    <div class="action-title">Data Obat</div>
+                    <p class="action-copy">Lihat stok dan informasi obat yang tersedia.</p>
+                </a>
             </div>
         </div>
     </div>

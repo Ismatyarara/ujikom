@@ -62,18 +62,8 @@
       from { opacity: 0; transform: translateY(40px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .register-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, #1A56DB, #60A5FA, #1A56DB);
-      background-size: 200% 100%;
-      border-radius: 22px 22px 0 0;
-      animation: bar 3s linear infinite;
-    }
-    @keyframes bar {
-      from { background-position: 0% 0%; }
-      to { background-position: 200% 0%; }
+    .register-card {
+      border: 1px solid #e5e7eb;
     }
 
     .step-indicator {

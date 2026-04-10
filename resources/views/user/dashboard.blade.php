@@ -37,6 +37,10 @@
 @endpush
 
 @section('content')
+@php
+    $unreadDoctorReplyCount = $unreadDoctorReplyCount ?? 0;
+    $latestDoctorReplies = $latestDoctorReplies ?? collect();
+@endphp
 <div class="mb-4">
     <h3 class="font-weight-bold mb-1">Selamat Datang, {{ $profile->nama_panjang ?? Auth::user()->name }}!</h3>
     <p class="text-muted mb-0"><span class="text-primary font-weight-bold">HealTack</span> - Sistem Informasi Kesehatan Anda</p>

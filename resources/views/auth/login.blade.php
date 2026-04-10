@@ -270,7 +270,6 @@
         <path fill="none" d="M0 0h48v48H0z"/>
       </svg>
       Lanjutkan dengan Google
-      <span class="otp-badge">+ OTP</span>
     </a>
 
     <div class="card-footer-text">

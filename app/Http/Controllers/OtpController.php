@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OtpMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class OtpController extends Controller
@@ -72,7 +74,13 @@ class OtpController extends Controller
         Cache::increment($rateLimitKey);
         Cache::put($rateLimitKey, Cache::get($rateLimitKey), now()->addMinutes(10));
 
-        static::sendOtp($email);
+        try {
+            static::sendOtp($email);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'OTP gagal dikirim. Periksa konfigurasi email lalu coba lagi.');
+        }
 
         return back()->with('success', 'Kode OTP baru telah dikirim.');
     }
@@ -83,9 +91,11 @@ class OtpController extends Controller
 
         Cache::put('otp_' . $email, $otp, now()->addMinutes(10));
 
-        Mail::send('emails.otp', ['otp' => $otp], function ($m) use ($email) {
-            $m->to($email)->subject('Kode Verifikasi HealTack');
-        });
+        Mail::to($email)->send(new OtpMail($otp));
+
+        Log::info('OTP email sent.', [
+            'email' => $email,
+        ]);
 
         return $otp;
     }

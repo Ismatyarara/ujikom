@@ -7,7 +7,6 @@ use App\Http\Controllers\OtpController;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -51,10 +50,20 @@ class RegisterController extends Controller
         event(new Registered($user));
 
         session([
-            'otp_email'  => $user->email,
+            'otp_email' => $user->email,
             'otp_source' => 'register',
         ]);
-        OtpController::sendOtp($user->email);
+
+        try {
+            OtpController::sendOtp($user->email);
+        } catch (\Throwable $e) {
+            report($e);
+            $user->delete();
+
+            return back()
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->withErrors(['email' => 'OTP gagal dikirim. Periksa konfigurasi email lalu coba lagi.']);
+        }
 
         return redirect()->route('otp.verify');
     }

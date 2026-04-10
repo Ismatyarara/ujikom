@@ -1,3 +1,15 @@
+@php
+    $dokterUserIds = \App\Models\Dokter::pluck('user_id');
+    $chatNotifications = \App\Models\ChMessage::with('sender')
+        ->where('to_id', Auth::id())
+        ->whereIn('from_id', $dokterUserIds)
+        ->where('seen', false)
+        ->latest()
+        ->take(5)
+        ->get();
+    $chatNotificationCount = $chatNotifications->count();
+@endphp
+
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
     <a class="navbar-brand brand-logo mr-5" href="{{ route('user.dashboard') }}">
@@ -15,44 +27,37 @@
     </button>
     
     <ul class="navbar-nav navbar-nav-right">
-      <!-- Notifications -->
       <li class="nav-item dropdown">
         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
           <i class="icon-bell mx-0"></i>
-          <span class="count"></span>
+          @if($chatNotificationCount > 0)
+            <span class="count"></span>
+          @endif
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifikasi</p>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-success">
-                <i class="ti-calendar mx-0"></i>
+          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifikasi Chat</p>
+          @forelse($chatNotifications as $notification)
+            <a class="dropdown-item preview-item" href="{{ route(config('chatify.routes.prefix')) }}">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-primary">
+                  <i class="ti-comments mx-0"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <h6 class="preview-subject font-weight-normal">{{ $notification->sender->name ?? 'Dokter' }}</h6>
+                <p class="font-weight-light small-text mb-0 text-muted">{{ \Illuminate\Support\Str::limit($notification->body, 35) }}</p>
+              </div>
+            </a>
+          @empty
+            <div class="dropdown-item preview-item">
+              <div class="preview-item-content">
+                <h6 class="preview-subject font-weight-normal">Belum ada balasan dokter.</h6>
               </div>
             </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Jadwal Konsultasi Anda</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Besok, 10:00 WIB
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-info">
-                <i class="ti-check mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Resep Siap Diambil</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                2 jam yang lalu
-              </p>
-            </div>
-          </a>
+          @endforelse
         </div>
       </li>
       
-      <!-- Profile Dropdown -->
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
           @if(Auth::user()->profile && Auth::user()->profile->foto)
@@ -90,8 +95,7 @@
             </a>
           @endif
           
-          <a class="dropdown-item" href="{{ route('logout') }}" 
-             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="ti-power-off text-primary"></i>
             Logout
           </a>

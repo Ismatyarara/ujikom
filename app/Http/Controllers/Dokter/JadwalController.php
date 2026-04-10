@@ -64,32 +64,33 @@ class JadwalController extends Controller
         $request->validate([
             'user_id'         => 'required|exists:users,id',
             'obats'           => 'required|array|min:1',
-            'obats.*'         => 'required|string|max:255',
+            'obats.*'         => 'required|distinct|exists:obat,kode_obat',
             'deskripsi'       => 'nullable|string',
             'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
         ]);
 
-        // Buat satu jadwal per obat
-        $firstJadwal = null;
-        foreach ($request->obats as $namaObat) {
-            $jadwal = Jadwal::create([
+        foreach ($request->obats as $kodeObat) {
+            $obat = Obat::where('kode_obat', $kodeObat)->first();
+
+            if (! $obat) {
+                continue;
+            }
+
+            Jadwal::create([
                 'user_id'         => $request->user_id,
                 'dokter_id'       => $dokter->id,
-                'nama_obat'       => $namaObat,
+                'catatan_medis_id'=> $request->catatan_id,
+                'nama_obat'       => $obat->nama_obat,
                 'deskripsi'       => $request->deskripsi,
                 'tanggal_mulai'   => $request->tanggal_mulai,
                 'tanggal_selesai' => $request->tanggal_selesai,
             ]);
-
-            if (! $firstJadwal) {
-                $firstJadwal = $jadwal;
-            }
         }
 
         return redirect()
-            ->route('dokter.jadwal.waktu.create', $firstJadwal->id)
-            ->with('success', 'Jadwal berhasil dibuat! Silakan atur waktu minum obat.');
+            ->route('dokter.jadwal.index')
+            ->with('success', 'Jadwal obat berhasil dibuat.');
     }
 
     // ─────────────────────────────────────────
@@ -123,15 +124,17 @@ class JadwalController extends Controller
         $dokter = Dokter::where('user_id', Auth::id())->firstOrFail();
 
         $request->validate([
-            'nama_obat'       => 'required|string|max:255',
+            'obat_kode'       => 'required|exists:obat,kode_obat',
             'deskripsi'       => 'nullable|string',
             'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
         ]);
 
+        $obat = Obat::where('kode_obat', $request->obat_kode)->firstOrFail();
+
         $jadwal->update([
             'dokter_id'       => $dokter->id,
-            'nama_obat'       => $request->nama_obat,
+            'nama_obat'       => $obat->nama_obat,
             'deskripsi'       => $request->deskripsi,
             'tanggal_mulai'   => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,

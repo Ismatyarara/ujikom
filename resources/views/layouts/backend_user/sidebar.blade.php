@@ -1,3 +1,13 @@
+@php
+    $user = Auth::user();
+    $isProfileComplete = $user->profile && !empty($user->profile->no_hp) && !empty($user->profile->alamat);
+    $dokterUserIds = \App\Models\Dokter::pluck('user_id');
+    $unreadDoctorReplyCount = \App\Models\ChMessage::where('to_id', $user->id)
+        ->whereIn('from_id', $dokterUserIds)
+        ->where('seen', false)
+        ->count();
+@endphp
+
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
         @auth
@@ -10,52 +20,43 @@
                 </li>
 
                 <li class="nav-item {{ request()->routeIs('user.profile*') ? 'active' : '' }}">
-                    <a class="nav-link" data-toggle="collapse" href="#profile"
-                        aria-expanded="{{ request()->routeIs('user.profile*') ? 'true' : 'false' }}"
-                        aria-controls="profile">
+                    <a class="nav-link" data-toggle="collapse" href="#profile" aria-expanded="{{ request()->routeIs('user.profile*') ? 'true' : 'false' }}" aria-controls="profile">
                         <i class="icon-head menu-icon"></i>
                         <span class="menu-title">Profile Saya</span>
                         <i class="menu-arrow"></i>
                     </a>
                     <div class="collapse {{ request()->routeIs('user.profile*') ? 'show' : '' }}" id="profile">
                         <ul class="nav flex-column sub-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('user.profile.show') ? 'active' : '' }}"
-                                    href="{{ route('user.profile.show') }}">
-                                    Lihat Profile
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('user.profile.edit') ? 'active' : '' }}"
-                                    href="{{ route('user.profile.edit') }}">
-                                    Edit Profile
-                                </a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.profile.show') ? 'active' : '' }}" href="{{ route('user.profile.show') }}">Lihat Profile</a></li>
+                            <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.profile.edit') ? 'active' : '' }}" href="{{ route('user.profile.edit') }}">Edit Profile</a></li>
                         </ul>
                     </div>
                 </li>
 
-                @php
-                    $user = Auth::user();
-                    $isProfileComplete =
-                        $user->profile && !empty($user->profile->no_hp) && !empty($user->profile->alamat);
-                @endphp
-
                 @if ($isProfileComplete)
-                    <li class="nav-item {{ request()->routeIs('user.konsultasi.index', 'user.konsultasi.create', 'user.konsultasi.store', 'user.konsultasi.show', 'user.konsultasi.edit', 'user.konsultasi.update', 'user.konsultasi.destroy') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->is(trim(config('chatify.routes.prefix'), '/').'*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route(config('chatify.routes.prefix')) }}">
+                            <i class="fas fa-comments menu-icon"></i>
+                            <span class="menu-title">Chat Dokter</span>
+                            @if($unreadDoctorReplyCount > 0)
+                                <span class="badge badge-primary ml-auto">{{ $unreadDoctorReplyCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+
+                    <li class="nav-item {{ request()->routeIs('user.konsultasi.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.konsultasi.index') }}">
                             <i class="fas fa-comment-medical menu-icon"></i>
                             <span class="menu-title">Konsultasi</span>
                         </a>
                     </li>
 
-                    <li class="nav-item {{ request()->routeIs('user.catatan.index', 'user.catatan.create', 'user.catatan.store', 'user.catatan.show', 'user.catatan.edit', 'user.catatan.update', 'user.catatan.destroy') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('user.catatan.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.catatan.index') }}">
                             <i class="fas fa-file-medical-alt menu-icon"></i>
                             <span class="menu-title">Catatan Medis</span>
                         </a>
                     </li>
-
 
                     <li class="nav-item {{ request()->routeIs('user.jadwal.index', 'user.jadwal.show') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.jadwal.index') }}">
@@ -64,41 +65,24 @@
                         </a>
                     </li>
 
-                    <li class="nav-item {{ request()->routeIs('toko.index', 'toko.show', 'toko.keranjang', 'toko.tambahKeranjang', 'toko.updateKeranjang', 'toko.hapusKeranjang', 'toko.beliSekarang', 'toko.checkout', 'toko.prosesCheckout', 'toko.pembayaran', 'toko.riwayat') ? 'active' : '' }}">
-                        <a class="nav-link" data-toggle="collapse" href="#toko"
-                            aria-expanded="{{ request()->routeIs('toko.index', 'toko.show', 'toko.keranjang', 'toko.tambahKeranjang', 'toko.updateKeranjang', 'toko.hapusKeranjang', 'toko.beliSekarang', 'toko.checkout', 'toko.prosesCheckout', 'toko.pembayaran', 'toko.riwayat') ? 'true' : 'false' }}" aria-controls="toko">
+                    <li class="nav-item {{ request()->routeIs('toko.*') ? 'active' : '' }}">
+                        <a class="nav-link" data-toggle="collapse" href="#toko" aria-expanded="{{ request()->routeIs('toko.*') ? 'true' : 'false' }}" aria-controls="toko">
                             <i class="fas fa-store menu-icon"></i>
                             <span class="menu-title">Toko Obat</span>
                             <i class="menu-arrow"></i>
                         </a>
-                        <div class="collapse {{ request()->routeIs('toko.index', 'toko.show', 'toko.keranjang', 'toko.tambahKeranjang', 'toko.updateKeranjang', 'toko.hapusKeranjang', 'toko.beliSekarang', 'toko.checkout', 'toko.prosesCheckout', 'toko.pembayaran', 'toko.riwayat') ? 'show' : '' }}" id="toko">
+                        <div class="collapse {{ request()->routeIs('toko.*') ? 'show' : '' }}" id="toko">
                             <ul class="nav flex-column sub-menu">
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('toko.index') ? 'active' : '' }}"
-                                        href="{{ route('toko.index') }}">
-                                        Beli Obat
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('toko.keranjang') ? 'active' : '' }}"
-                                        href="{{ route('toko.keranjang') }}">
-                                        Keranjang
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('toko.riwayat') ? 'active' : '' }}"
-                                        href="{{ route('toko.riwayat') }}">
-                                        Riwayat Transaksi
-                                    </a>
-                                </li>
+                                <li class="nav-item"><a class="nav-link {{ request()->routeIs('toko.index') ? 'active' : '' }}" href="{{ route('toko.index') }}">Beli Obat</a></li>
+                                <li class="nav-item"><a class="nav-link {{ request()->routeIs('toko.keranjang') ? 'active' : '' }}" href="{{ route('toko.keranjang') }}">Keranjang</a></li>
+                                <li class="nav-item"><a class="nav-link {{ request()->routeIs('toko.riwayat') ? 'active' : '' }}" href="{{ route('toko.riwayat') }}">Riwayat Transaksi</a></li>
                             </ul>
                         </div>
                     </li>
                 @endif
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
+                    <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
                         <i class="icon-power menu-icon"></i>
                         <span class="menu-title">Logout</span>
                     </a>
@@ -127,7 +111,6 @@
                     </div>
                 </div>
             </li>
-
         @endauth
     </ul>
 </nav>

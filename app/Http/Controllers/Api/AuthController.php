@@ -52,7 +52,17 @@ class AuthController extends Controller
             'kode_pasien' => User::generateKodePasien(),
         ]);
 
-        OtpController::sendOtp($user->email);
+        try {
+            OtpController::sendOtp($user->email);
+        } catch (\Throwable $e) {
+            report($e);
+            $user->delete();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP gagal dikirim. Periksa konfigurasi email lalu coba lagi.',
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,
@@ -88,7 +98,16 @@ class AuthController extends Controller
         $user  = User::where('email', $request->email)->firstOrFail();
 
         if (! $user->hasVerifiedEmail()) {
-            OtpController::sendOtp($user->email);
+            try {
+                OtpController::sendOtp($user->email);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP gagal dikirim. Periksa konfigurasi email lalu coba lagi.',
+                ], 500);
+            }
 
             return response()->json([
                 'success' => false,

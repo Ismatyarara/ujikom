@@ -64,7 +64,7 @@
                 {{-- header buttons --}}
                 <nav class="m-header-right">
                     <a href="#" class="add-to-favorite"><i class="fas fa-star"></i></a>
-                    <a href="/"><i class="fas fa-home"></i></a>
+                    <a href="{{ auth()->user()->role === 'dokter' ? route('dokter.konsultasi.index') : (auth()->user()->role === 'user' ? route('user.konsultasi.index') : route(config('chatify.routes.prefix'))) }}"><i class="fas fa-home"></i></a>
                     <a href="#" class="show-infoSide"><i class="fas fa-info-circle"></i></a>
                 </nav>
             </nav>

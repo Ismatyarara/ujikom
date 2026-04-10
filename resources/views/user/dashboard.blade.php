@@ -37,16 +37,21 @@
 @endpush
 
 @section('content')
-
-{{-- Header --}}
 <div class="mb-4">
-    <h3 class="font-weight-bold mb-1">
-        Selamat Datang, {{ $profile->nama_panjang ?? Auth::user()->name }}!
-    </h3>
-    <p class="text-muted mb-0"><span class="text-primary font-weight-bold">HealTack</span> — Sistem Informasi Kesehatan Anda</p>
+    <h3 class="font-weight-bold mb-1">Selamat Datang, {{ $profile->nama_panjang ?? Auth::user()->name }}!</h3>
+    <p class="text-muted mb-0"><span class="text-primary font-weight-bold">HealTack</span> - Sistem Informasi Kesehatan Anda</p>
 </div>
 
-{{-- Alert --}}
+@if($unreadDoctorReplyCount > 0)
+    <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <strong>{{ $unreadDoctorReplyCount }} balasan dokter belum dibaca.</strong>
+            <div class="small">Buka chat untuk melihat pesan terbaru.</div>
+        </div>
+        <a href="{{ route(config('chatify.routes.prefix')) }}" class="btn btn-sm btn-primary">Buka Chat</a>
+    </div>
+@endif
+
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show mb-4">
         {{ session('success') }}
@@ -54,21 +59,15 @@
     </div>
 @endif
 
-{{-- Top Row: Profile + Info --}}
 <div class="row mb-4">
-
-    {{-- Profile --}}
     <div class="col-md-4 mb-4 mb-md-0">
         <div class="card dash-card h-100">
             <div class="card-body text-center py-4">
-                        @if($profile && $profile->foto)
-                            <img src="{{ asset('storage/'.$profile->foto) }}"
-                                 class="avatar mb-3">
-                        @else
-                            <div class="avatar avatar-fallback">
-                                {{ Auth::user()->initials }}
-                            </div>
-                        @endif
+                @if($profile && $profile->foto)
+                    <img src="{{ asset('storage/'.$profile->foto) }}" class="avatar mb-3">
+                @else
+                    <div class="avatar avatar-fallback">{{ Auth::user()->initials }}</div>
+                @endif
 
                 <h5 class="mb-1">{{ $profile->nama_panjang ?? '-' }}</h5>
                 <small class="text-muted d-block mb-2">{{ Auth::user()->email }}</small>
@@ -78,19 +77,14 @@
                 </span>
 
                 @if($profile->tanggal_lahir)
-                    <p class="text-muted small mb-3">
-                        {{ \Carbon\Carbon::parse($profile->tanggal_lahir)->age }} tahun
-                    </p>
+                    <p class="text-muted small mb-3">{{ \Carbon\Carbon::parse($profile->tanggal_lahir)->age }} tahun</p>
                 @endif
 
-                <a href="{{ route('user.profile.show') }}" class="btn btn-primary btn-sm btn-block">
-                    Lihat Profile
-                </a>
+                <a href="{{ route('user.profile.show') }}" class="btn btn-primary btn-sm btn-block">Lihat Profile</a>
             </div>
         </div>
     </div>
 
-    {{-- Quick Info --}}
     <div class="col-md-8">
         <div class="card dash-card h-100">
             <div class="card-body">
@@ -99,8 +93,8 @@
                 @php
                 $infos = [
                     ['label' => 'Golongan Darah', 'value' => $profile->golongan_darah ?? '-'],
-                    ['label' => 'No. HP',         'value' => $profile->no_hp ?? '-'],
-                    ['label' => 'Alamat',         'value' => $profile->alamat ?? '-'],
+                    ['label' => 'No. HP', 'value' => $profile->no_hp ?? '-'],
+                    ['label' => 'Alamat', 'value' => $profile->alamat ?? '-'],
                 ];
                 @endphp
 
@@ -111,22 +105,29 @@
                     </div>
                 @endforeach
 
+                @if($latestDoctorReplies->isNotEmpty())
+                    <hr>
+                    <h6 class="font-weight-bold">Balasan Dokter Terbaru</h6>
+                    @foreach($latestDoctorReplies as $reply)
+                        <div class="info-row">
+                            <small class="text-muted d-block">{{ $reply->sender->name ?? 'Dokter' }}</small>
+                            <strong>{{ \Illuminate\Support\Str::limit($reply->body, 60) }}</strong>
+                        </div>
+                    @endforeach
+                @endif
             </div>
         </div>
     </div>
-
 </div>
 
-{{-- Menu Cards --}}
 <h5 class="mb-3 font-weight-bold">Menu Utama</h5>
 <div class="row">
-
     @php
     $menus = [
-        ['color' => 'primary', 'title' => 'Konsultasi',  'desc' => 'Chat dengan dokter',  'url' => '#'],
-        ['color' => 'success', 'title' => 'Lihat Obat',  'desc' => 'Informasi obat',      'url' => '#'],
-        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Atur jadwal minum',   'url' => '#'],
-        ['color' => 'info',    'title' => 'Profile',     'desc' => 'Kelola data diri',    'url' => route('user.profile.show')],
+        ['color' => 'primary', 'title' => 'Konsultasi', 'desc' => 'Chat dengan dokter', 'url' => route(config('chatify.routes.prefix'))],
+        ['color' => 'success', 'title' => 'Lihat Obat', 'desc' => 'Informasi obat', 'url' => '#'],
+        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Atur jadwal minum', 'url' => '#'],
+        ['color' => 'info', 'title' => 'Profile', 'desc' => 'Kelola data diri', 'url' => route('user.profile.show')],
     ];
     @endphp
 
@@ -141,7 +142,5 @@
         </div>
     </div>
     @endforeach
-
 </div>
-
 @endsection

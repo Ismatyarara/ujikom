@@ -5,9 +5,9 @@
         ->whereIn('from_id', $dokterUserIds)
         ->where('seen', false)
         ->latest()
-        ->take(5)
         ->get();
-    $chatNotificationCount = $chatNotifications->count();
+    $chatNotificationItems = $chatNotifications->unique('from_id')->take(5)->values();
+    $chatNotificationCount = $chatNotificationItems->count();
 @endphp
 
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -36,8 +36,8 @@
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
           <p class="mb-0 font-weight-normal float-left dropdown-header">Notifikasi Chat</p>
-          @forelse($chatNotifications as $notification)
-            <a class="dropdown-item preview-item" href="{{ route(config('chatify.routes.prefix')) }}">
+          @forelse($chatNotificationItems as $notification)
+            <a class="dropdown-item preview-item" href="{{ route('user', ['id' => $notification->from_id]) }}">
               <div class="preview-thumbnail">
                 <div class="preview-icon bg-primary">
                   <i class="ti-comments mx-0"></i>

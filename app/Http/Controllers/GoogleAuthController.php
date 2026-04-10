@@ -26,22 +26,26 @@ class GoogleAuthController extends Controller
             return redirect()->route('login')->with('error', 'Login Google gagal. Coba lagi.');
         }
 
-        $user = User::firstOrNew([
-            'email' => $googleUser->getEmail(),
-        ]);
+        $email = $googleUser->getEmail();
+        $user = User::firstOrNew(['email' => $email]);
 
-        $isNewUser = ! $user->exists;
+        $user->name = $googleUser->getName();
+        $user->google_id = $googleUser->getId();
+        $user->avatar = $googleUser->getAvatar();
 
-        $user->forceFill([
-            'name' => $googleUser->getName(),
-            'google_id' => $googleUser->getId(),
-            'avatar' => $googleUser->getAvatar(),
-            'email_verified_at' => $user->email_verified_at ?? now(),
-            'password' => $user->password ?: bcrypt(Str::random(24)),
-            'role' => $user->role ?: 'user',
-        ]);
+        if (! $user->email_verified_at) {
+            $user->email_verified_at = now();
+        }
 
-        if ($isNewUser || empty($user->kode_pasien)) {
+        if (! $user->password) {
+            $user->password = bcrypt(Str::random(24));
+        }
+
+        if (! $user->role) {
+            $user->role = 'user';
+        }
+
+        if (! $user->kode_pasien) {
             $user->kode_pasien = User::generateKodePasien();
         }
 

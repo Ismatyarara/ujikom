@@ -2,10 +2,19 @@
     $user = Auth::user();
     $isProfileComplete = $user->profile && !empty($user->profile->no_hp) && !empty($user->profile->alamat);
     $dokterUserIds = \App\Models\Dokter::pluck('user_id');
-    $unreadDoctorReplyCount = \App\Models\ChMessage::where('to_id', $user->id)
+    $unreadDoctorReplies = \App\Models\ChMessage::where('to_id', $user->id)
         ->whereIn('from_id', $dokterUserIds)
         ->where('seen', false)
-        ->count();
+        ->latest()
+        ->get();
+    $doctorIdsWithUnreadReply = $unreadDoctorReplies->pluck('from_id')->unique();
+    $unreadDoctorReplyCount = $doctorIdsWithUnreadReply->count();
+    $firstUnreadDoctorId = $doctorIdsWithUnreadReply->first();
+    $chatDoctorUrl = route(config('chatify.routes.prefix'));
+
+    if ($firstUnreadDoctorId) {
+        $chatDoctorUrl = route('user', ['id' => $firstUnreadDoctorId]);
+    }
 @endphp
 
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -35,7 +44,7 @@
 
                 @if ($isProfileComplete)
                     <li class="nav-item {{ request()->is(trim(config('chatify.routes.prefix'), '/').'*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route(config('chatify.routes.prefix')) }}">
+                        <a class="nav-link" href="{{ $chatDoctorUrl }}">
                             <i class="fas fa-comments menu-icon"></i>
                             <span class="menu-title">Chat Dokter</span>
                             @if($unreadDoctorReplyCount > 0)

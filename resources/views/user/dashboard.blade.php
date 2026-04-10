@@ -40,9 +40,21 @@
 @php
     $unreadDoctorReplyCount = $unreadDoctorReplyCount ?? 0;
     $latestDoctorReplies = $latestDoctorReplies ?? collect();
+    $namaUser = $profile->nama_panjang ?? Auth::user()->name;
+    $fotoProfile = $profile->foto ?? null;
+    $jenisKelamin = $profile->jenis_kelamin ?? '';
+    $labelJenisKelamin = $jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan';
+    $badgeJenisKelamin = $jenisKelamin === 'L' ? 'info' : 'warning';
+    $umur = $profile->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->age : null;
+    $menus = [
+        ['color' => 'primary', 'title' => 'Konsultasi', 'desc' => 'Chat dengan dokter', 'url' => route(config('chatify.routes.prefix'))],
+        ['color' => 'success', 'title' => 'Lihat Obat', 'desc' => 'Informasi obat', 'url' => '#'],
+        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Atur jadwal minum', 'url' => '#'],
+        ['color' => 'info', 'title' => 'Profile', 'desc' => 'Kelola data diri', 'url' => route('user.profile.show')],
+    ];
 @endphp
 <div class="mb-4">
-    <h3 class="font-weight-bold mb-1">Selamat Datang, {{ $profile->nama_panjang ?? Auth::user()->name }}!</h3>
+    <h3 class="font-weight-bold mb-1">Selamat Datang, {{ $namaUser }}!</h3>
     <p class="text-muted mb-0"><span class="text-primary font-weight-bold">HealTack</span> - Sistem Informasi Kesehatan Anda</p>
 </div>
 
@@ -67,21 +79,21 @@
     <div class="col-md-4 mb-4 mb-md-0">
         <div class="card dash-card h-100">
             <div class="card-body text-center py-4">
-                @if($profile && $profile->foto)
-                    <img src="{{ asset('storage/'.$profile->foto) }}" class="avatar mb-3">
+                @if($fotoProfile)
+                    <img src="{{ asset('storage/'.$fotoProfile) }}" class="avatar mb-3">
                 @else
                     <div class="avatar avatar-fallback">{{ Auth::user()->initials }}</div>
                 @endif
 
-                <h5 class="mb-1">{{ $profile->nama_panjang ?? '-' }}</h5>
+                <h5 class="mb-1">{{ $namaUser }}</h5>
                 <small class="text-muted d-block mb-2">{{ Auth::user()->email }}</small>
 
-                <span class="badge badge-{{ ($profile->jenis_kelamin ?? '') == 'L' ? 'info' : 'warning' }} mb-2">
-                    {{ ($profile->jenis_kelamin ?? '') == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                <span class="badge badge-{{ $badgeJenisKelamin }} mb-2">
+                    {{ $labelJenisKelamin }}
                 </span>
 
-                @if($profile->tanggal_lahir)
-                    <p class="text-muted small mb-3">{{ \Carbon\Carbon::parse($profile->tanggal_lahir)->age }} tahun</p>
+                @if($umur)
+                    <p class="text-muted small mb-3">{{ $umur }} tahun</p>
                 @endif
 
                 <a href="{{ route('user.profile.show') }}" class="btn btn-primary btn-sm btn-block">Lihat Profile</a>
@@ -126,15 +138,6 @@
 
 <h5 class="mb-3 font-weight-bold">Menu Utama</h5>
 <div class="row">
-    @php
-    $menus = [
-        ['color' => 'primary', 'title' => 'Konsultasi', 'desc' => 'Chat dengan dokter', 'url' => route(config('chatify.routes.prefix'))],
-        ['color' => 'success', 'title' => 'Lihat Obat', 'desc' => 'Informasi obat', 'url' => '#'],
-        ['color' => 'warning', 'title' => 'Jadwal Obat', 'desc' => 'Atur jadwal minum', 'url' => '#'],
-        ['color' => 'info', 'title' => 'Profile', 'desc' => 'Kelola data diri', 'url' => route('user.profile.show')],
-    ];
-    @endphp
-
     @foreach($menus as $menu)
     <div class="col-6 col-md-3 mb-4">
         <div class="card dash-card text-center">

@@ -1,7 +1,7 @@
 @php
     $user = Auth::user();
     $isProfileComplete = $user->profile && !empty($user->profile->no_hp) && !empty($user->profile->alamat);
-    $dokterUserIds = \App\Models\Dokter::pluck('user_id');
+    $dokterUserIds = \App\Models\Dokter::verified()->pluck('user_id');
     $unreadDoctorReplies = \App\Models\ChMessage::where('to_id', $user->id)
         ->whereIn('from_id', $dokterUserIds)
         ->where('seen', false)

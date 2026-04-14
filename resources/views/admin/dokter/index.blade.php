@@ -86,10 +86,35 @@
     background: #eff6ff;
     color: #2563eb;
   }
+  .doctor-badge.success {
+    background: #ecfdf3;
+    color: #15803d;
+  }
+  .doctor-badge.warning {
+    background: #fff7ed;
+    color: #c2410c;
+  }
   .doctor-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    min-width: 142px;
+  }
+  .doctor-action-row {
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: center;
+  }
+  .doctor-verify-form {
+    margin: 0;
+    width: 100%;
+  }
+  .doctor-verify-btn {
+    width: 100%;
+    border-radius: 10px;
+    font-weight: 600;
   }
   .doctor-action-btn {
     width: 38px;
@@ -105,6 +130,10 @@
   .doctor-action-btn.view { background: #3b82f6; }
   .doctor-action-btn.edit { background: #f59e0b; }
   .doctor-action-btn.delete { background: #ef4444; }
+  .doctor-table td.action-cell,
+  .doctor-table th.action-cell {
+    text-align: center;
+  }
   .doctor-empty {
     text-align: center;
     padding: 40px 20px;
@@ -146,7 +175,8 @@
                   <th>Pengalaman</th>
                   <th>Tempat Praktik</th>
                   <th>Jadwal</th>
-                  <th>Aksi</th>
+                  <th>Verifikasi</th>
+                  <th class="action-cell">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,17 +219,39 @@
                       </div>
                     </td>
                     <td>
+                      @if($dokter->is_verified)
+                        <span class="doctor-badge success">Terverifikasi</span>
+                      @else
+                        <span class="doctor-badge warning">Belum Verifikasi</span>
+                      @endif
+                    </td>
+                    <td class="action-cell">
                       <div class="doctor-actions">
-                        <a href="{{ route('admin.dokter.show', $dokter->id) }}" class="doctor-action-btn view" title="Lihat">
-                          <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="{{ route('admin.dokter.edit', $dokter->id) }}" class="doctor-action-btn edit" title="Edit">
-                          <i class="fas fa-edit"></i>
-                        </a>
-                        <button class="doctor-action-btn delete"
-                          onclick="confirmDelete({{ $dokter->id }})" title="Hapus">
-                          <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="doctor-action-row">
+                          <a href="{{ route('admin.dokter.show', $dokter->id) }}" class="doctor-action-btn view" title="Lihat">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="{{ route('admin.dokter.edit', $dokter->id) }}" class="doctor-action-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <button class="doctor-action-btn delete"
+                            onclick="confirmDelete({{ $dokter->id }})" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                        @if($dokter->is_verified)
+                          <form action="{{ route('admin.dokter.unverify', $dokter->id) }}" method="POST" class="doctor-verify-form">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-sm btn-outline-warning doctor-verify-btn">Batalkan Verifikasi</button>
+                          </form>
+                        @else
+                          <form action="{{ route('admin.dokter.verify', $dokter->id) }}" method="POST" class="doctor-verify-form">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-sm btn-outline-success doctor-verify-btn">Verifikasi</button>
+                          </form>
+                        @endif
                       </div>
 
                       <form id="delete-form-{{ $dokter->id }}"
@@ -212,7 +264,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="9" class="doctor-empty">Tidak ada data dokter</td>
+                    <td colspan="10" class="doctor-empty">Tidak ada data dokter</td>
                   </tr>
                 @endforelse
               </tbody>

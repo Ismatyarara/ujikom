@@ -19,7 +19,7 @@ class BarangMasukController extends Controller
 
     public function create()
     {
-        $obat = Obat::where('status', 1)->orderBy('nama_obat')->get();
+        $obat = Obat::where('status', 1)->orderBy('kode_obat')->get();
 
         return view('staff.barang-masuk.create', compact('obat'));
     }
@@ -71,7 +71,7 @@ class BarangMasukController extends Controller
 
     public function edit(BarangMasuk $barangMasuk)
     {
-        $obat = Obat::where('status', 1)->orderBy('nama_obat')->get();
+        $obat = Obat::where('status', 1)->orderBy('kode_obat')->get();
 
         return view('staff.barang-masuk.edit', compact('barangMasuk', 'obat'));
     }
@@ -88,8 +88,10 @@ class BarangMasukController extends Controller
 
         $obatLama = Obat::findOrFail($barangMasuk->id_obat);
         $obatBaru = Obat::findOrFail($request->id_obat);
+        $jumlahLama = (int) $barangMasuk->jumlah;
+        $jumlahBaru = (int) $request->jumlah;
 
-        if ($obatLama->stok < $barangMasuk->jumlah) {
+        if ($obatLama->stok < $jumlahLama) {
             return back()->withErrors([
                 'jumlah' => 'Stok ' . $obatLama->nama_obat . ' sudah terpakai, tidak bisa mengedit data ini.',
             ])->withInput();
@@ -98,15 +100,21 @@ class BarangMasukController extends Controller
         DB::beginTransaction();
 
         try {
-            $obatLama->stok = $obatLama->stok - $barangMasuk->jumlah;
-            $obatLama->save();
+            if ($obatLama->id === $obatBaru->id) {
+                $selisihJumlah = $jumlahBaru - $jumlahLama;
+                $obatBaru->stok = $obatBaru->stok + $selisihJumlah;
+                $obatBaru->save();
+            } else {
+                $obatLama->stok = $obatLama->stok - $jumlahLama;
+                $obatLama->save();
 
-            $obatBaru->stok = $obatBaru->stok + $request->jumlah;
-            $obatBaru->save();
+                $obatBaru->stok = $obatBaru->stok + $jumlahBaru;
+                $obatBaru->save();
+            }
 
             $barangMasuk->update([
                 'id_obat' => $request->id_obat,
-                'jumlah' => $request->jumlah,
+                'jumlah' => $jumlahBaru,
                 'tanggal_masuk' => $request->tanggal_masuk,
                 'tanggal_kadaluwarsa' => $request->tanggal_kadaluwarsa,
                 'deskripsi' => $request->deskripsi,

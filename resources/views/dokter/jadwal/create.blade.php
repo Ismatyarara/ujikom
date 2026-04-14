@@ -61,7 +61,7 @@
     <div class="form-card">
         <div class="card-head">
             <h4><i class="fas fa-calendar-plus me-2"></i> Tambah Jadwal Obat</h4>
-            <p>Cari obat dengan kode atau nama, lalu simpan jadwal tanpa langkah tambahan.</p>
+            <p>Cari obat dengan kode obat, lalu simpan jadwal tanpa langkah tambahan.</p>
         </div>
 
         <div class="card-body">
@@ -104,9 +104,9 @@
                 <div class="obat-list" id="obatList">
                     <div class="obat-row">
                         <div style="flex:1">
-                            <input type="text" class="form-control obat-input" list="obatOptions" placeholder="Ketik kode obat atau nama obat" onchange="syncObatCode(this)" required>
+                            <input type="text" class="form-control obat-input" list="obatOptions" placeholder="Ketik kode obat" onchange="syncObatCode(this)" autocomplete="off" required>
                             <input type="hidden" name="obats[]" value="">
-                            <small style="color:#64748b">Contoh: OBT001 - Paracetamol 500 mg</small>
+                            <small style="color:#64748b" class="obat-help">Contoh: OBT001 - Paracetamol 500 mg</small>
                             <div class="obat-error">Obat yang sama sudah dipilih.</div>
                         </div>
                         <button type="button" class="btn-remove-obat" onclick="removeObat(this)" style="visibility:hidden">
@@ -116,7 +116,7 @@
                 </div>
                 <datalist id="obatOptions">
                     @foreach($obats as $o)
-                        <option value="{{ $o->kode_obat }} - {{ $o->nama_obat }}"></option>
+                        <option value="{{ $o->kode_obat }}" label="{{ $o->nama_obat }}"></option>
                     @endforeach
                 </datalist>
                 <button type="button" class="btn-add-obat" onclick="addObat()">
@@ -153,6 +153,8 @@
 
 @push('scripts')
 <script>
+    const obatMap = @json($obats->pluck('nama_obat', 'kode_obat'));
+
     function getSelectedObatCodes() {
         return Array.from(document.querySelectorAll('#obatList input[name="obats[]"]'))
             .map((input) => input.value.trim())
@@ -190,7 +192,27 @@
     function syncObatCode(input) {
         const row = input.closest('.obat-row');
         const hiddenInput = row.querySelector('input[name="obats[]"]');
-        hiddenInput.value = (input.value || '').split(' - ')[0].trim();
+        const helpText = row.querySelector('.obat-help');
+        const code = (input.value || '').trim().toUpperCase();
+
+        input.value = code;
+        hiddenInput.value = '';
+        helpText.textContent = 'Contoh: OBT001 - Paracetamol 500 mg';
+
+        if (!code) {
+            validateDuplicateObat();
+            return;
+        }
+
+        if (!obatMap[code]) {
+            input.setCustomValidity('Kode obat tidak ditemukan.');
+            input.reportValidity();
+            return;
+        }
+
+        input.setCustomValidity('');
+        hiddenInput.value = code;
+        helpText.textContent = code + ' - ' + obatMap[code];
         validateDuplicateObat();
 
         if (input.classList.contains('is-invalid')) {
@@ -199,6 +221,7 @@
             input.setCustomValidity('');
             input.classList.remove('is-invalid');
             row.querySelector('.obat-error').classList.remove('show');
+            helpText.textContent = 'Contoh: OBT001 - Paracetamol 500 mg';
             alert('Obat yang sama tidak bisa dipilih dua kali.');
         }
     }
@@ -215,9 +238,9 @@
         row.className = 'obat-row';
         row.innerHTML = `
             <div style="flex:1">
-                <input type="text" class="form-control obat-input" list="obatOptions" placeholder="Ketik kode obat atau nama obat" onchange="syncObatCode(this)" required>
+                <input type="text" class="form-control obat-input" list="obatOptions" placeholder="Ketik kode obat" onchange="syncObatCode(this)" autocomplete="off" required>
                 <input type="hidden" name="obats[]" value="">
-                <small style="color:#64748b">Contoh: OBT001 - Paracetamol 500 mg</small>
+                <small style="color:#64748b" class="obat-help">Contoh: OBT001 - Paracetamol 500 mg</small>
                 <div class="obat-error">Obat yang sama sudah dipilih.</div>
             </div>
             <button type="button" class="btn-remove-obat" onclick="removeObat(this)">

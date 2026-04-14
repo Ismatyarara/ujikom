@@ -14,15 +14,13 @@ use Illuminate\Support\Facades\Auth;
 
 class JadwalController extends Controller
 {
-    // ─────────────────────────────────────────
-    //  INDEX
-    // ─────────────────────────────────────────
+   
   public function index(Request $request)
 {
     $query = Jadwal::with(['user', 'dokter', 'waktuObat'])
         ->orderByDesc('created_at');
 
-    // ✅ filter by pasien kalau ada
+   
     if ($request->filled('user_id')) {
         $query->where('user_id', $request->user_id);
     }
@@ -32,9 +30,7 @@ class JadwalController extends Controller
     return view('dokter.jadwal.index', compact('jadwals'));
 }
 
-    // ─────────────────────────────────────────
-    //  CREATE  — WAJIB dari catatan medis
-    // ─────────────────────────────────────────
+
     public function create(Request $request)
     {
         // Tanpa catatan_id → arahkan ke catatan medis
@@ -45,7 +41,7 @@ class JadwalController extends Controller
         }
 
         $dokter         = Dokter::where('user_id', Auth::id())->firstOrFail();
-        $obats          = Obat::orderBy('nama_obat')->get();
+        $obats          = Obat::orderBy('kode_obat')->get();
         $catatan        = CatatanMedis::with('user')->findOrFail($request->catatan_id);
         $pasienSelected = $catatan->user;
 
@@ -54,9 +50,8 @@ class JadwalController extends Controller
         ));
     }
 
-    // ─────────────────────────────────────────
     //  STORE  — simpan jadwal + multi-obat + redirect ke atur waktu
-    // ─────────────────────────────────────────
+ 
     public function store(Request $request)
     {
         $dokter = Dokter::where('user_id', Auth::id())->firstOrFail();
@@ -93,9 +88,9 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal obat berhasil dibuat.');
     }
 
-    // ─────────────────────────────────────────
+ 
     //  SHOW
-    // ─────────────────────────────────────────
+
     public function show($id)
     {
         $jadwal = Jadwal::with(['user', 'dokter', 'waktuObat'])->findOrFail($id);
@@ -103,21 +98,15 @@ class JadwalController extends Controller
         return view('dokter.jadwal.show', compact('jadwal'));
     }
 
-    // ─────────────────────────────────────────
-    //  EDIT
-    // ─────────────────────────────────────────
     public function edit($id)
     {
         $jadwal = Jadwal::with(['user', 'dokter', 'waktuObat'])->findOrFail($id);
         $dokter = Dokter::where('user_id', Auth::id())->firstOrFail();
-        $obats  = Obat::orderBy('nama_obat')->get();
+        $obats  = Obat::orderBy('kode_obat')->get();
 
         return view('dokter.jadwal.edit', compact('jadwal', 'dokter', 'obats'));
     }
 
-    // ─────────────────────────────────────────
-    //  UPDATE
-    // ─────────────────────────────────────────
     public function update(Request $request, $id)
     {
         $jadwal = Jadwal::findOrFail($id);
@@ -145,9 +134,6 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal berhasil diperbarui!');
     }
 
-    // ─────────────────────────────────────────
-    //  DESTROY
-    // ─────────────────────────────────────────
     public function destroy($id)
     {
         $jadwal = Jadwal::findOrFail($id);
@@ -159,9 +145,9 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal berhasil dihapus.');
     }
 
-    // ─────────────────────────────────────────
+   
     //  WAKTU MINUM OBAT — Step 2
-    // ─────────────────────────────────────────
+   
     public function createWaktu($jadwalId)
     {
         $jadwal = Jadwal::with(['user', 'dokter'])->findOrFail($jadwalId);
@@ -188,7 +174,7 @@ class JadwalController extends Controller
             ->with('success', 'Waktu minum obat berhasil ditambahkan!');
     }
 
-    // ✅ Redirect ke show detail jadwal yang baru dibuat
+    // Redirect ke show detail jadwal yang baru dibuat
     return redirect()
         ->route('dokter.jadwal.show', $jadwalId)
         ->with('success', 'Jadwal dan waktu minum obat berhasil disimpan!');

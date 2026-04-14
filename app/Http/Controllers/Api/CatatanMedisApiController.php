@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CatatanMedisApiController extends Controller
 {
-    // ================================================================
+    
     // GET /api/catatan
     // Dokter  : semua catatan (bisa filter by kode_pasien)
     // User    : hanya catatan milik sendiri
-    // ================================================================
+    
     public function index(Request $request)
     {
         $user = $request->user();
@@ -28,13 +28,13 @@ class CatatanMedisApiController extends Controller
         return $this->successResponse('Data catatan medis berhasil diambil.', $catatan);
     }
 
-    // ================================================================
+    
     // POST /api/catatan
     // Hanya dokter yang bisa tambah catatan
-    // ================================================================
+    
     public function store(Request $request)
     {
-        $user = $request->user(); // ← ganti ini
+        $user = $request->user(); 
 
     if (!$user) {
         return response()->json(['message' => 'Unauthorized'], 401);
@@ -67,11 +67,11 @@ class CatatanMedisApiController extends Controller
         return $this->successResponse('Catatan medis berhasil ditambahkan.', $this->formatCatatan($catatan), 201);
     }
 
-    // ================================================================
+    
     // GET /api/catatan/{id}
     // Dokter  : bisa lihat semua
     // User    : hanya milik sendiri
-    // ================================================================
+    
     public function show(Request $request, $id)
     {
         $user    = $request->user();
@@ -91,7 +91,8 @@ class CatatanMedisApiController extends Controller
     // ================================================================
     // PUT /api/catatan/{id}
     // Hanya dokter yang bisa edit catatan
-    // ================================================================
+ 
+    
     public function update(Request $request, $id)
     {
         $user = $request->user();
@@ -122,10 +123,11 @@ class CatatanMedisApiController extends Controller
         return $this->successResponse('Catatan medis berhasil diperbarui.', $this->formatCatatan($catatan));
     }
 
-    // ================================================================
+ 
+    
     // DELETE /api/catatan/{id}
     // Hanya dokter yang bisa hapus catatan
-    // ================================================================
+    
     public function destroy(Request $request, $id)
     {
         $user = $request->user();
@@ -144,10 +146,6 @@ class CatatanMedisApiController extends Controller
         return $this->successResponse('Catatan medis berhasil dihapus.');
     }
 
-
-    // ================================================================
-    // PRIVATE HELPERS
-    // ================================================================
 
     // Ambil semua catatan untuk dokter (bisa filter kode_pasien)
     private function getCatatanUntukDokter(Request $request)
@@ -230,9 +228,9 @@ class CatatanMedisApiController extends Controller
     }
 
 
-    // ================================================================
+    
     // RESPONSE HELPERS — biar response konsisten di semua method
-    // ================================================================
+    
 
     private function successResponse(string $message, $data = null, int $status = 200)
     {

@@ -14,30 +14,6 @@
     </button>
     
     <ul class="navbar-nav navbar-nav-right">
-      <!-- Notifications -->
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-          <i class="icon-bell mx-0"></i>
-          <span class="count"></span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-success">
-                <i class="ti-info-alt mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Application Error</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Just now
-              </p>
-            </div>
-          </a>
-        </div>
-      </li>
-      
       <!-- Profile -->
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
@@ -49,15 +25,8 @@
           <div class="dropdown-header text-center">
             <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name }}</p>
             <p class="font-weight-light text-muted mb-0">{{ Auth::user()->email }}</p>
+            <p class="font-weight-light text-muted mb-0"><small>Admin</small></p>
           </div>
-          <a class="dropdown-item" href="#">
-            <i class="ti-user text-primary"></i>
-            My Profile
-          </a>
-          <a class="dropdown-item" href="#">
-            <i class="ti-settings text-primary"></i>
-            Settings
-          </a>
           <a class="dropdown-item" href="{{ route('logout') }}" 
              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="ti-power-off text-primary"></i>

@@ -8,7 +8,6 @@
     <div class="card">
       <div class="card-body">
 
-        {{-- Header --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h4 class="card-title mb-0">Tambah Barang Masuk</h4>
@@ -19,33 +18,35 @@
           </a>
         </div>
 
-        {{-- Form --}}
         <form action="{{ route('staff.barang-masuk.store') }}" method="POST">
           @csrf
 
-          {{-- Pilih Obat --}}
           <div class="mb-3">
-            <label for="id_obat" class="form-label fw-semibold">
-              Obat <span class="text-danger">*</span>
+            <label for="kode_obat_input" class="form-label fw-semibold">
+              Kode Obat <span class="text-danger">*</span>
             </label>
-            <select name="id_obat" id="id_obat"
-                    class="form-select @error('id_obat') is-invalid @enderror">
-              <option value="">-- Pilih Obat --</option>
+            <input type="text"
+                   id="kode_obat_input"
+                   class="form-control @error('id_obat') is-invalid @enderror"
+                   list="daftar_kode_obat"
+                   placeholder="Ketik kode obat"
+                   value="{{ old('kode_obat_input') }}"
+                   autocomplete="off"
+                   onchange="pilihObatBarangMasuk()">
+            <input type="hidden" name="id_obat" id="id_obat" value="{{ old('id_obat') }}">
+            <datalist id="daftar_kode_obat">
               @foreach($obat as $item)
-                <option value="{{ $item->id }}"
-                  {{ old('id_obat') == $item->id ? 'selected' : '' }}>
-                  {{ $item->nama_obat }}
-                  ({{ $item->kode_obat }})
-                  — Stok: {{ $item->stok }} {{ $item->satuan }}
-                </option>
+                <option value="{{ $item->kode_obat }}">{{ $item->nama_obat }}</option>
               @endforeach
-            </select>
+            </datalist>
             @error('id_obat')
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror
+            <div class="form-text" id="infoObat">
+              Pilih obat berdasarkan kode. Nama obat dan stok akan tampil otomatis.
+            </div>
           </div>
 
-          {{-- Jumlah --}}
           <div class="mb-3">
             <label for="jumlah" class="form-label fw-semibold">
               Jumlah <span class="text-danger">*</span>
@@ -59,7 +60,6 @@
             <div class="form-text">Stok obat akan bertambah sesuai jumlah yang dimasukkan.</div>
           </div>
 
-          {{-- Tanggal Masuk & Kadaluwarsa --}}
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="tanggal_masuk" class="form-label fw-semibold">
@@ -86,7 +86,6 @@
             </div>
           </div>
 
-          {{-- Deskripsi --}}
           <div class="mb-4">
             <label for="deskripsi" class="form-label fw-semibold">Keterangan</label>
             <textarea name="deskripsi" id="deskripsi" rows="3"
@@ -97,13 +96,11 @@
             @enderror
           </div>
 
-          {{-- Info Box --}}
           <div class="alert alert-info d-flex align-items-center mb-4">
             <i class="fas fa-info-circle me-2 fs-5"></i>
             <div>Setelah disimpan, stok obat yang dipilih akan <strong>bertambah</strong> secara otomatis.</div>
           </div>
 
-          {{-- Tombol --}}
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">
               <i class="fas fa-save me-1"></i> Simpan
@@ -119,3 +116,54 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+@php
+  $daftarObatBarangMasuk = $obat->map(function ($item) {
+    return [
+      'id' => $item->id,
+      'kode' => $item->kode_obat,
+      'nama' => $item->nama_obat,
+      'stok' => $item->stok,
+      'satuan' => $item->satuan,
+    ];
+  })->values();
+@endphp
+<script>
+  const daftarObatBarangMasuk = @json($daftarObatBarangMasuk);
+
+  function pilihObatBarangMasuk() {
+    const inputKode = document.getElementById('kode_obat_input');
+    const inputId = document.getElementById('id_obat');
+    const infoObat = document.getElementById('infoObat');
+    const kode = inputKode.value.trim().toUpperCase();
+
+    inputKode.value = kode;
+    inputId.value = '';
+    infoObat.textContent = 'Pilih obat berdasarkan kode. Nama obat dan stok akan tampil otomatis.';
+
+    if (kode === '') {
+      inputKode.setCustomValidity('');
+      return;
+    }
+
+    const obatDipilih = daftarObatBarangMasuk.find(function (item) {
+      return item.kode === kode;
+    });
+
+    if (!obatDipilih) {
+      inputKode.setCustomValidity('Kode obat tidak ditemukan.');
+      inputKode.reportValidity();
+      return;
+    }
+
+    inputKode.setCustomValidity('');
+    inputId.value = obatDipilih.id;
+    infoObat.textContent = obatDipilih.kode + ' - ' + obatDipilih.nama + ' | Stok: ' + obatDipilih.stok + ' ' + obatDipilih.satuan;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    pilihObatBarangMasuk();
+  });
+</script>
+@endpush

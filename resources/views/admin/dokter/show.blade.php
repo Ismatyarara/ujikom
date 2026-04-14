@@ -60,12 +60,16 @@
                             <tr>
                                 <th>Status Akun</th>
                                 <td>:
-                                    @if ($dokter->pengguna->email_verified_at)
+                                    @if ($dokter->is_verified)
                                         <span class="badge badge-success">Terverifikasi</span>
                                     @else
                                         <span class="badge badge-warning">Belum Verifikasi</span>
                                     @endif
                                 </td>
+                            </tr>
+                            <tr>
+                                <th>Diverifikasi Pada</th>
+                                <td>: {{ $dokter->verified_at ? $dokter->verified_at->format('d M Y H:i') : '-' }}</td>
                             </tr>
                             <tr>
                                 <th>Terdaftar</th>
@@ -87,6 +91,23 @@
                 <a href="{{ route('admin.dokter.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
+                @if($dokter->is_verified)
+                    <form action="{{ route('admin.dokter.unverify', $dokter->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-outline-warning">
+                            Batalkan Verifikasi
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('admin.dokter.verify', $dokter->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-success">
+                            Verifikasi Dokter
+                        </button>
+                    </form>
+                @endif
                 <button class="btn btn-danger float-right" onclick="hapus({{ $dokter->id }})">
                     Hapus
                 </button>

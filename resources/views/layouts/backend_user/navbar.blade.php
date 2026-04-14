@@ -1,15 +1,3 @@
-@php
-    $dokterUserIds = \App\Models\Dokter::pluck('user_id');
-    $chatNotifications = \App\Models\ChMessage::with('sender')
-        ->where('to_id', Auth::id())
-        ->whereIn('from_id', $dokterUserIds)
-        ->where('seen', false)
-        ->latest()
-        ->get();
-    $chatNotificationItems = $chatNotifications->unique('from_id')->take(5)->values();
-    $chatNotificationCount = $chatNotificationItems->count();
-@endphp
-
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
     <a class="navbar-brand brand-logo mr-5" href="{{ route('user.dashboard') }}">
@@ -27,37 +15,6 @@
     </button>
     
     <ul class="navbar-nav navbar-nav-right">
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-          <i class="icon-bell mx-0"></i>
-          @if($chatNotificationCount > 0)
-            <span class="count"></span>
-          @endif
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifikasi Chat</p>
-          @forelse($chatNotificationItems as $notification)
-            <a class="dropdown-item preview-item" href="{{ route('user', ['id' => $notification->from_id]) }}">
-              <div class="preview-thumbnail">
-                <div class="preview-icon bg-primary">
-                  <i class="ti-comments mx-0"></i>
-                </div>
-              </div>
-              <div class="preview-item-content">
-                <h6 class="preview-subject font-weight-normal">{{ $notification->sender->name ?? 'Dokter' }}</h6>
-                <p class="font-weight-light small-text mb-0 text-muted">{{ \Illuminate\Support\Str::limit($notification->body, 35) }}</p>
-              </div>
-            </a>
-          @empty
-            <div class="dropdown-item preview-item">
-              <div class="preview-item-content">
-                <h6 class="preview-subject font-weight-normal">Belum ada balasan dokter.</h6>
-              </div>
-            </div>
-          @endforelse
-        </div>
-      </li>
-      
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
           @if(Auth::user()->profile && Auth::user()->profile->foto)

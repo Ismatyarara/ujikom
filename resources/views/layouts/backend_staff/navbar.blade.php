@@ -14,30 +14,6 @@
     </button>
     
     <ul class="navbar-nav navbar-nav-right">
-      <!-- Notifications -->
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-          <i class="icon-bell mx-0"></i>
-          <span class="count"></span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifikasi</p>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-info">
-                <i class="ti-info-alt mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Penjualan Obat Baru</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Baru saja
-              </p>
-            </div>
-          </a>
-        </div>
-      </li>
-      
       <!-- Profile -->
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
@@ -51,14 +27,6 @@
             <p class="font-weight-light text-muted mb-0">{{ Auth::user()->email }}</p>
             <p class="font-weight-light text-muted mb-0"><small>Staff</small></p>
           </div>
-          <a class="dropdown-item" href="#">
-            <i class="ti-user text-primary"></i>
-            Profil Saya
-          </a>
-          <a class="dropdown-item" href="#">
-            <i class="ti-settings text-primary"></i>
-            Pengaturan
-          </a>
           <a class="dropdown-item" href="{{ route('logout') }}" 
              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="ti-power-off text-primary"></i>

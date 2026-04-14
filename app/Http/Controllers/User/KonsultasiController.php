@@ -24,18 +24,13 @@ class KonsultasiController extends Controller
      */
     public function show($id)
     {
-        // Cari spesialisasi berdasarkan ID
         $spesialisasi = Spesialisasi::findOrFail($id);
-        
-        // Ambil semua dokter dengan spesialisasi_id yang sesuai
-        $dokters = Dokter::where('spesialisasi_id', $id)
-                         ->with(['spesialisasi', 'pengguna'])
-                         ->get();
-        
-        // Debug jika tidak ada dokter
-        // \Log::info('Spesialisasi ID: ' . $id);
-        // \Log::info('Jumlah Dokter: ' . $dokters->count());
-        
+
+        $dokters = Dokter::verified()
+            ->where('spesialisasi_id', $id)
+            ->with(['spesialisasi', 'pengguna'])
+            ->get();
+
         return view('user.konsultasi.show', compact('spesialisasi', 'dokters'));
     }
 }

@@ -22,7 +22,7 @@ class JadwalObatWaktuController extends Controller
         ]);
     }
 
-    // ✅ Redirect ke show detail jadwal
+    // Redirect ke show detail jadwal
     return redirect()
         ->route('dokter.jadwal.show', $jadwalId)
         ->with('success', 'Waktu minum obat berhasil ditambahkan.');

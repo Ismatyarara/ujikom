@@ -18,67 +18,20 @@
     </button>
 
     <ul class="navbar-nav navbar-nav-right">
-
-      {{-- Notifikasi Pesan --}}
-      @auth
-        @php
-          $unread = \App\Models\ChMessage::where('to_id', auth()->id())
-                      ->where('seen', 0)
-                      ->count();
-
-          $recentMessages = \App\Models\ChMessage::where('to_id', auth()->id())
-                              ->where('seen', 0)
-                              ->with('sender')
-                              ->latest()
-                              ->take(3)
-                              ->get();
-        @endphp
-
-        <li class="nav-item dropdown">
-          <a class="nav-link count-indicator dropdown-toggle" href="#" data-toggle="dropdown">
-            <i class="icon-bell mx-0"></i>
-            @if($unread > 0)
-              <span class="count bg-danger text-white">{{ $unread }}</span>
-            @endif
-          </a>
-
-          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list">
-            <p class="dropdown-header">Pesan Baru</p>
-
-            @forelse($recentMessages as $msg)
-              <a class="dropdown-item preview-item" href="{{ route('user', ['id' => $msg->from_id]) }}">
-                <div class="preview-thumbnail">
-                  @if($msg->sender?->avatar)
-                    <img src="{{ $msg->sender->avatar }}" class="rounded-circle" width="40" height="40">
-                  @else
-                    <span class="rounded-circle d-inline-flex align-items-center justify-content-center"
-                          style="width:40px;height:40px;background:#e0e7ff;color:#3730a3;font-weight:700;">
-                      {{ $msg->sender?->initials ?? 'U' }}
-                    </span>
-                  @endif
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject">{{ $msg->sender?->name ?? 'Unknown' }}</h6>
-                  <p class="small text-muted mb-0">{{ \Illuminate\Support\Str::limit($msg->body, 35) }}</p>
-                </div>
-              </a>
-            @empty
-              <div class="dropdown-item text-center text-muted">Tidak ada pesan baru</div>
-            @endforelse
-
-            @if($unread > 0)
-              <a class="dropdown-item text-center" href="{{ route(config('chatify.routes.prefix')) }}">Lihat Semua Pesan</a>
-            @endif
-          </div>
-        </li>
-      @endauth
-
       {{-- Profile Dokter --}}
       @auth
         <li class="nav-item nav-profile dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-            @if(auth()->user()->avatar)
-              <img src="{{ auth()->user()->avatar }}" alt="profile"/>
+            @php
+              $avatarDokter = auth()->user()->avatar;
+            @endphp
+            @if($avatarDokter)
+              <img src="{{ $avatarDokter }}"
+                   alt="profile"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+              <span style="width:38px;height:38px;border-radius:50%;display:none;align-items:center;justify-content:center;background:#e0e7ff;color:#3730a3;font-weight:700;">
+                {{ auth()->user()->initials }}
+              </span>
             @else
               <span style="width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#e0e7ff;color:#3730a3;font-weight:700;">
                 {{ auth()->user()->initials }}

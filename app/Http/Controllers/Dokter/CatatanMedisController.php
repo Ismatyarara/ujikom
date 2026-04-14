@@ -25,7 +25,7 @@ class CatatanMedisController extends Controller
             ->findOrFail($id);
     }
 
-    // ================= INDEX =================
+  
     public function index(Request $request)
     {
         $dokter = $this->getDokterAktif();
@@ -51,7 +51,7 @@ class CatatanMedisController extends Controller
         return view('dokter.catatan.index', compact('catatan', 'pasienDicari'));
     }
 
-    // ================= CREATE =================
+    
     public function create(Request $request)
     {
         $selectedUserId = $request->user_id ? (int) $request->user_id : null;
@@ -68,7 +68,6 @@ class CatatanMedisController extends Controller
         return view('dokter.catatan.create', compact('pasien', 'selectedUserId', 'selectedPasien'));
     }
 
-    // ================= STORE =================
     public function store(Request $request)
     {
         $request->validate([
@@ -94,7 +93,6 @@ class CatatanMedisController extends Controller
             ->with('success', 'Catatan berhasil ditambahkan.');
     }
 
-    // ================= EDIT =================
     public function edit($id)
     {
         $catatan = $this->getCatatanDokter((int) $id);
@@ -102,7 +100,6 @@ class CatatanMedisController extends Controller
         return view('dokter.catatan.edit', compact('catatan'));
     }
 
-    // ================= UPDATE =================
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -126,7 +123,7 @@ class CatatanMedisController extends Controller
             ->with('success', 'Catatan berhasil diperbarui.');
     }
 
-    // ================= DESTROY =================
+   
     public function destroy($id)
     {
         $catatan = $this->getCatatanDokter((int) $id);

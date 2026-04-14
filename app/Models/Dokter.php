@@ -20,9 +20,16 @@ class Dokter extends Model
         'jadwal_praktik_hari',
         'jadwal_praktik_waktu',
         'tempat_praktik',
+        'is_verified',
+        'verified_at',
+        'verified_by',
     ];
 
     protected $appends = ['foto_url', 'inisial_nama'];
+    protected $casts = [
+        'is_verified' => 'boolean',
+        'verified_at' => 'datetime',
+    ];
 
     public function pengguna()
     {
@@ -32,6 +39,11 @@ class Dokter extends Model
     public function spesialisasi()
     {
         return $this->belongsTo(Spesialisasi::class, 'spesialisasi_id');
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     public function getFotoUrlAttribute()
@@ -58,5 +70,10 @@ class Dokter extends Model
             ->implode('');
 
         return $inisial !== '' ? $inisial : 'DR';
+    }
+
+    public function scopeVerified($query)
+    {
+        return $query->where('is_verified', true);
     }
 }

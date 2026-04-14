@@ -51,11 +51,11 @@ class Obat extends Model
 
     // ==================== Accessors ====================
 
-    public function getFotoUrlAttribute(): string
+        public function getFotoUrlAttribute(): ?string
     {
         return $this->foto
             ? asset('storage/' . $this->foto)
-            : asset('assets/images/obat-default.png');
+            : null;
     }
 
     public function getIsAktifAttribute(): bool

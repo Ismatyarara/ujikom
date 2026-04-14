@@ -52,6 +52,10 @@ Route::middleware(['auth', 'role:admin'])
             ->name('dashboard');
 
         Route::resource('dokter', App\Http\Controllers\Admin\DokterController::class);
+        Route::patch('dokter/{dokter}/verify', [App\Http\Controllers\Admin\DokterController::class, 'verify'])
+            ->name('dokter.verify');
+        Route::patch('dokter/{dokter}/unverify', [App\Http\Controllers\Admin\DokterController::class, 'unverify'])
+            ->name('dokter.unverify');
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
         Route::get('obat/pembelian', [ObatController::class, 'pembelian'])

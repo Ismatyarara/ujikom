@@ -22,7 +22,7 @@ class DashboardController extends Controller
 
         // Ambil data profile
         $profile = $user->profile;
-        $dokterUserIds = Dokter::pluck('user_id');
+        $dokterUserIds = Dokter::verified()->pluck('user_id');
         $unreadDoctorReplies = ChMessage::with('sender')
             ->where('to_id', $user->id)
             ->whereIn('from_id', $dokterUserIds)

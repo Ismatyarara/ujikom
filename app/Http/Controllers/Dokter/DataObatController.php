@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class DataObatController extends Controller
 {
-    // ================= INDEX =================
+   
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search'));
@@ -29,7 +29,6 @@ class DataObatController extends Controller
         return view('dokter.data-obat.index', compact('obat', 'search'));
     }
 
-    // ================= SHOW =================
     public function show($id)
     {
         $obat = Obat::findOrFail($id);

@@ -54,3 +54,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/jadwal',      [JadwalApiController::class, 'index']);
     Route::get('/jadwal/{id}', [JadwalApiController::class, 'show']);
 });
+
+
+use App\Http\Controllers\Api\TokoApiController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    // ...route lainnya
+
+    Route::prefix('obat')->group(function () {
+        Route::get('/', [TokoApiController::class, 'index']);
+        Route::get('/{id}', [TokoApiController::class, 'show']);
+    });
+
+    Route::prefix('toko')->group(function () {
+        Route::post('/beli', [TokoApiController::class, 'beli']);
+        Route::get('/riwayat', [TokoApiController::class, 'riwayat']);
+        Route::get('/riwayat/{id}', [TokoApiController::class, 'detailTransaksi']);
+    });
+});

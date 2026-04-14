@@ -26,7 +26,8 @@ class KonsultasiApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Spesialisasi tidak ditemukan'], 404);
         }
 
-        $dokters = Dokter::where('spesialisasi_id', $id)
+        $dokters = Dokter::verified()
+            ->where('spesialisasi_id', $id)
             ->with(['spesialisasi', 'pengguna'])
             ->get();
 

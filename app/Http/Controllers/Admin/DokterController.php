@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dokter;
 use App\Models\Spesialisasi;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -72,6 +73,7 @@ class DokterController extends Controller
             'jadwal_praktik_waktu' => $data['jadwal_praktik_waktu'],
             'tempat_praktik' => $data['tempat_praktik'],
             'pengalaman' => $data['pengalaman'] ?? null,
+            'is_verified' => false,
         ]);
 
         return redirect()->route('admin.dokter.index')
@@ -157,5 +159,29 @@ class DokterController extends Controller
 
         return redirect()->route('admin.dokter.index')
             ->with('success', 'Dokter berhasil dihapus.');
+    }
+
+    public function verify(Dokter $dokter)
+    {
+        $dokter->update([
+            'is_verified' => true,
+            'verified_at' => now(),
+            'verified_by' => Auth::id(),
+        ]);
+
+        return redirect()->route('admin.dokter.index')
+            ->with('success', 'Dokter berhasil diverifikasi.');
+    }
+
+    public function unverify(Dokter $dokter)
+    {
+        $dokter->update([
+            'is_verified' => false,
+            'verified_at' => null,
+            'verified_by' => null,
+        ]);
+
+        return redirect()->route('admin.dokter.index')
+            ->with('success', 'Verifikasi dokter berhasil dibatalkan.');
     }
 }
